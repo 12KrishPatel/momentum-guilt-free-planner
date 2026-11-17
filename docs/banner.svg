@@ -1,0 +1,168 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-label="Momentum — Guilt-Free Planner">
+  <defs>
+    <!-- Obsidian backdrop -->
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#090A0F"/>
+      <stop offset="1" stop-color="#121521"/>
+    </linearGradient>
+
+    <!-- Accent gradients -->
+    <linearGradient id="primary" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6366F1"/>
+      <stop offset="1" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <linearGradient id="primaryH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6366F1"/>
+      <stop offset="0.55" stop-color="#8B5CF6"/>
+      <stop offset="1" stop-color="#06B6D4"/>
+    </linearGradient>
+    <linearGradient id="success" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10B981"/>
+      <stop offset="1" stop-color="#06B6D4"/>
+    </linearGradient>
+    <linearGradient id="legendary" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F59E0B"/>
+      <stop offset="1" stop-color="#EC4899"/>
+    </linearGradient>
+
+    <!-- Ambient glows -->
+    <radialGradient id="glowViolet" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#8B5CF6" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#8B5CF6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowEmerald" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#10B981" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#10B981" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowRose" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#EC4899" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#EC4899" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowGold" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FBBF24" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#FBBF24" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowSilver" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#CBD5E1" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#CBD5E1" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Tier rims -->
+    <linearGradient id="rimSilver" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F8FAFC"/>
+      <stop offset="0.35" stop-color="#94A3B8"/>
+      <stop offset="0.65" stop-color="#E2E8F0"/>
+      <stop offset="1" stop-color="#64748B"/>
+    </linearGradient>
+    <linearGradient id="rimGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FDE68A"/>
+      <stop offset="0.35" stop-color="#B45309"/>
+      <stop offset="0.65" stop-color="#FCD34D"/>
+      <stop offset="1" stop-color="#92400E"/>
+    </linearGradient>
+    <linearGradient id="rimObsidian" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F59E0B"/>
+      <stop offset="0.4" stop-color="#EC4899"/>
+      <stop offset="0.75" stop-color="#8B5CF6"/>
+      <stop offset="1" stop-color="#6366F1"/>
+    </linearGradient>
+
+    <!-- Medallion cores -->
+    <radialGradient id="coreSuccess" cx="0.3" cy="0.25" r="0.9">
+      <stop offset="0" stop-color="#34D399"/>
+      <stop offset="1" stop-color="#0891B2"/>
+    </radialGradient>
+    <radialGradient id="corePrimary" cx="0.3" cy="0.25" r="0.9">
+      <stop offset="0" stop-color="#A78BFA"/>
+      <stop offset="1" stop-color="#4F46E5"/>
+    </radialGradient>
+    <radialGradient id="coreObsidian" cx="0.35" cy="0.3" r="0.8">
+      <stop offset="0" stop-color="#2E2645"/>
+      <stop offset="1" stop-color="#07070C"/>
+    </radialGradient>
+
+    <!-- Specular highlight & glass edge -->
+    <linearGradient id="specular" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="glassEdge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.02"/>
+    </linearGradient>
+
+    <clipPath id="frame">
+      <rect width="1280" height="420" rx="28"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <rect width="1280" height="420" fill="url(#bg)"/>
+    <circle cx="1010" cy="150" r="330" fill="url(#glowViolet)"/>
+    <circle cx="120" cy="430" r="260" fill="url(#glowEmerald)"/>
+
+    <!-- Title block -->
+    <g font-family="SF Pro Rounded, ui-rounded, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif">
+      <text x="80" y="110" font-size="17" font-weight="800" letter-spacing="4" fill="#FFFFFF" fill-opacity="0.62">WEEKLY PLANNER · TROPHY CASE · LEISURE REWARDS</text>
+      <text x="76" y="200" font-size="96" font-weight="800" fill="#FFFFFF">Momentum</text>
+      <text x="80" y="256" font-size="42" font-weight="700" fill="url(#primaryH)">Guilt-Free Planner</text>
+      <text x="80" y="302" font-size="21" font-weight="500" fill="#FFFFFF" fill-opacity="0.62">Plan the week. Earn the badges. Take the break — guilt-free.</text>
+
+      <!-- Glass pills -->
+      <g font-size="15" font-weight="700">
+        <rect x="80" y="330" width="104" height="36" rx="18" fill="#FFFFFF" fill-opacity="0.06" stroke="url(#glassEdge)" stroke-width="1"/>
+        <circle cx="100" cy="348" r="5" fill="url(#primary)"/>
+        <text x="113" y="353" fill="#FFFFFF">iOS 17+</text>
+
+        <rect x="196" y="330" width="104" height="36" rx="18" fill="#FFFFFF" fill-opacity="0.06" stroke="url(#glassEdge)" stroke-width="1"/>
+        <circle cx="216" cy="348" r="5" fill="url(#legendary)"/>
+        <text x="229" y="353" fill="#FFFFFF">Swift 6</text>
+
+        <rect x="312" y="330" width="178" height="36" rx="18" fill="#FFFFFF" fill-opacity="0.06" stroke="url(#glassEdge)" stroke-width="1"/>
+        <circle cx="332" cy="348" r="5" fill="url(#success)"/>
+        <text x="345" y="353" fill="#FFFFFF">SwiftUI · SwiftData</text>
+      </g>
+    </g>
+
+    <!-- Silver medallion: checkmark -->
+    <g transform="translate(862 262)">
+      <circle r="92" fill="url(#glowSilver)"/>
+      <circle r="58" fill="url(#rimSilver)"/>
+      <circle r="49" fill="url(#coreSuccess)"/>
+      <circle r="42" fill="none" stroke="#FFFFFF" stroke-opacity="0.22" stroke-width="1.5"/>
+      <path d="M-18 1 L-5 14 L19 -12" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+      <ellipse cx="0" cy="-26" rx="29" ry="15" fill="url(#specular)"/>
+    </g>
+
+    <!-- Gold medallion: bolt -->
+    <g transform="translate(1158 262)">
+      <circle r="92" fill="url(#glowGold)"/>
+      <circle r="58" fill="url(#rimGold)"/>
+      <circle r="49" fill="url(#corePrimary)"/>
+      <circle r="42" fill="none" stroke="#FFFFFF" stroke-opacity="0.22" stroke-width="1.5"/>
+      <polygon points="5,-27 -15,4 -2,4 -7,27 15,-6 2,-6" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round"/>
+      <ellipse cx="0" cy="-26" rx="29" ry="15" fill="url(#specular)"/>
+    </g>
+
+    <!-- Obsidian medallion: star (legendary, centered and raised) -->
+    <g transform="translate(1010 178) scale(1.25)">
+      <circle r="92" fill="url(#glowRose)"/>
+      <circle r="58" fill="url(#rimObsidian)"/>
+      <circle r="49" fill="url(#coreObsidian)"/>
+      <circle r="42" fill="none" stroke="#FFFFFF" stroke-opacity="0.22" stroke-width="1.5"/>
+      <polygon points="0,-26 6.47,-8.9 24.73,-8.03 10.46,3.4 15.28,21.03 0,11 -15.28,21.03 -10.46,3.4 -24.73,-8.03 -6.47,-8.9" fill="url(#legendary)" stroke="url(#legendary)" stroke-width="2" stroke-linejoin="round"/>
+      <ellipse cx="0" cy="-26" rx="29" ry="15" fill="url(#specular)"/>
+    </g>
+
+    <!-- Sparkles -->
+    <g fill="#FFFFFF">
+      <path d="M930 70 l3 9 9 3 -9 3 -3 9 -3 -9 -9 -3 9 -3z" fill-opacity="0.85"/>
+      <path d="M1102 92 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2z" fill-opacity="0.6"/>
+      <path d="M1218 150 l2.5 7 7 2.5 -7 2.5 -2.5 7 -2.5 -7 -7 -2.5 7 -2.5z" fill-opacity="0.7"/>
+      <path d="M800 160 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2z" fill-opacity="0.5"/>
+    </g>
+
+    <!-- Specular top edge -->
+    <rect x="0.5" y="0.5" width="1279" height="419" rx="28" fill="none" stroke="url(#glassEdge)"/>
+  </g>
+</svg>
