@@ -1,16 +1,15 @@
 import Charts
 import SwiftData
 import SwiftUI
-import UIKit
 import UserNotifications
 
 struct StatsView: View {
     @Environment(TaskStore.self) private var store
     @Environment(NotificationManager.self) private var notificationManager
-    @Environment(\.openURL) private var openURL
     @Query private var tasks: [TaskItem]
     @Query private var awards: [Award]
     @Query private var redemptions: [RewardRedemption]
+    @Query private var events: [MomentumEvent]
 
     @State private var isConfirmingReset = false
     @State private var resetCount = 0
@@ -32,10 +31,10 @@ struct StatsView: View {
 
                 Section {
                     LazyVGrid(columns: cardColumns, spacing: 12) {
-                        StatCard(title: "Total XP", value: PlannerStats.totalXP(tasks), icon: "star.fill", colors: Theme.primaryColors)
+                        StatCard(title: "Total XP", value: PlannerStats.totalXP(tasks, events: events), icon: "star.fill", colors: Theme.primaryColors)
                         StatCard(
                             title: "Leisure Points",
-                            value: RewardMath.balance(tasks: tasks, redemptions: redemptions),
+                            value: RewardMath.balance(tasks: tasks, redemptions: redemptions, events: events),
                             icon: "leaf.fill",
                             colors: Theme.successColors
                         )
@@ -112,8 +111,9 @@ struct StatsView: View {
                 }
                 .glassRow()
             }
+            .groupedListStyle()
             .themedScreen()
-            .navigationTitle("Profile")
+            .navigationTitle(Platform.isMac ? "Stats & Settings" : "Profile")
             .confirmationDialog(
                 "Replace all tasks, badges and passes with demo data?",
                 isPresented: $isConfirmingReset,
@@ -165,9 +165,7 @@ struct StatsView: View {
                 .controlSize(.small)
             case .denied:
                 Button("Settings") {
-                    if let url = URL(string: UIApplication.openNotificationSettingsURLString) {
-                        openURL(url)
-                    }
+                    notificationManager.openSystemNotificationSettings()
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
@@ -187,7 +185,9 @@ struct PermissionBadge: View {
         switch status {
         case .authorized: ("Allowed", "checkmark.circle.fill", Theme.emerald)
         case .provisional: ("Quiet Delivery", "moon.circle.fill", Theme.cyan)
+        #if os(iOS)
         case .ephemeral: ("Temporary", "clock.fill", Theme.cyan)
+        #endif
         case .denied: ("Denied", "xmark.circle.fill", Theme.rose)
         case .notDetermined: ("Not Requested", "questionmark.circle.fill", Theme.amber)
         @unknown default: ("Unknown", "questionmark.circle.fill", .gray)

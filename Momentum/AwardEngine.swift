@@ -51,7 +51,7 @@ struct AwardUnlock: Identifiable, Equatable, Sendable {
 @MainActor
 @Observable
 final class AwardEngine {
-    // MARK: Catalog (24 badges)
+    // MARK: Catalog (25 badges)
 
     nonisolated static let definitions: [AwardDefinition] = [
         // Consistency & Streaks
@@ -107,6 +107,12 @@ final class AwardEngine {
             details: "Clear every task scheduled this week (Mon–Sun, at least 7 tasks) before Sunday night.",
             category: .planning, tier: .gold, iconName: "tray.and.arrow.down.fill", target: 7,
             tip: "Plan a realistic week, then finish everything on it before it ends."
+        ),
+        // V4. Not "sunday_planner": that V1 id was renamed to Architect and is migrated away.
+        AwardDefinition(
+            id: "sunday_reset_planner", title: "Sunday Planner", details: "Complete a Sunday Reset ritual.",
+            category: .planning, tier: .bronze, iconName: "rectangle.stack.badge.play.fill", target: 1,
+            tip: "On Sunday, open the Plan menu and swipe through last week's leftovers."
         ),
 
         // Volume & Effort
@@ -215,12 +221,8 @@ final class AwardEngine {
     func seedAwardsIfNeeded(in context: ModelContext) {
         let existing = (try? context.fetch(FetchDescriptor<Award>())) ?? []
         var byID: [String: Award] = [:]
-        for award in existing {
-            if byID[award.id] == nil {
-                byID[award.id] = award
-            } else {
-                context.delete(award)
-            }
+        for (id, copies) in Dictionary(grouping: existing, by: \.id) {
+            byID[id] = mergeDuplicates(copies, in: context)
         }
 
         for (legacyID, newID) in Self.legacyIDs {
@@ -252,6 +254,27 @@ final class AwardEngine {
         if context.hasChanges {
             try? context.save()
         }
+    }
+
+    /// Collapses copies of the same badge (e.g. seeded on two devices before their first iCloud
+    /// sync) into one, keeping the earliest unlock and the highest progress. Every device picks
+    /// the same survivor, so concurrent cleanups converge.
+    private func mergeDuplicates(_ copies: [Award], in context: ModelContext) -> Award {
+        let ordered = copies.sorted { lhs, rhs in
+            if lhs.isUnlocked != rhs.isUnlocked { return lhs.isUnlocked }
+            let l = lhs.unlockedDate ?? .distantFuture
+            let r = rhs.unlockedDate ?? .distantFuture
+            if l != r { return l < r }
+            return lhs.currentProgress > rhs.currentProgress
+        }
+        let keeper = ordered[0]
+        for duplicate in ordered.dropFirst() {
+            if duplicate.currentProgress > keeper.currentProgress {
+                keeper.currentProgress = duplicate.currentProgress
+            }
+            context.delete(duplicate)
+        }
+        return keeper
     }
 
     private func makeAward(from definition: AwardDefinition) -> Award {
@@ -286,13 +309,16 @@ final class AwardEngine {
         let isEarned: Bool
     }
 
-    /// Evaluates all 24 rules against the current tasks.
+    /// Evaluates every rule against the current tasks and ritual events.
     static func evaluateRules(
-        tasks: [TaskItem],
+        tasks allTasks: [TaskItem],
+        events: [MomentumEvent] = [],
         now: Date = .now,
         calendar: Calendar = .current
     ) -> [String: RuleResult] {
         let today = calendar.startOfDay(for: now)
+        // Tasks cleared in a Sunday Reset no longer count as planned or overdue.
+        let tasks = allTasks.filter { !$0.isArchived || $0.isCompleted }
 
         // Completions
         let completions: [(task: TaskItem, date: Date)] = tasks.compactMap { task in
@@ -300,7 +326,8 @@ final class AwardEngine {
             return (task, date)
         }
         let completedCount = completions.count
-        let totalXP = completions.reduce(0) { $0 + $1.task.effort.points }
+        // Combo multipliers and ritual bonuses count toward XP badges.
+        let totalXP = completions.reduce(0) { $0 + $1.task.earnedXP } + events.reduce(0) { $0 + $1.xp }
 
         var countPerDay: [Date: Int] = [:]
         var xpPerDay: [Date: Int] = [:]
@@ -311,7 +338,7 @@ final class AwardEngine {
         for (task, date) in completions {
             let day = calendar.startOfDay(for: date)
             countPerDay[day, default: 0] += 1
-            xpPerDay[day, default: 0] += task.effort.points
+            xpPerDay[day, default: 0] += task.earnedXP
             if task.effort == .deepWork {
                 deepPerDay[day, default: 0] += 1
                 deepTotal += 1
@@ -329,6 +356,11 @@ final class AwardEngine {
             let elapsed = date.timeIntervalSince(task.createdAt)
             if elapsed >= 0, elapsed <= 2 * 60 * 60 { speedy += 1 }
         }
+
+        for event in events where event.xp > 0 {
+            xpPerDay[calendar.startOfDay(for: event.occurredAt), default: 0] += event.xp
+        }
+        let sundayResets = events.count { $0.kind == .sundayReset }
 
         let bestDayCount = countPerDay.values.max() ?? 0
         let bestDayXP = xpPerDay.values.max() ?? 0
@@ -388,6 +420,7 @@ final class AwardEngine {
             // While a blocker remains, the bar stops one short so it never reads "full but locked".
             "clean_slate": result(cleanSlate ? 10 : min(completedCount, 9), cleanSlate),
             "inbox_zero_hero": result(inboxZero ? 7 : min(weekDone, 6), inboxZero),
+            "sunday_reset_planner": result(min(sundayResets, 1), sundayResets >= 1),
 
             "getting_rolling": result(completedCount, completedCount >= 10),
             "heavy_lifter": result(deepTotal, deepTotal >= 10),
@@ -414,7 +447,8 @@ final class AwardEngine {
     func evaluate(in context: ModelContext, announce: Bool = true, now: Date = .now) -> [AwardUnlock] {
         let tasks = (try? context.fetch(FetchDescriptor<TaskItem>())) ?? []
         let awards = (try? context.fetch(FetchDescriptor<Award>())) ?? []
-        let results = Self.evaluateRules(tasks: tasks, now: now)
+        let events = (try? context.fetch(FetchDescriptor<MomentumEvent>())) ?? []
+        let results = Self.evaluateRules(tasks: tasks, events: events, now: now)
 
         var unlocked: [AwardUnlock] = []
         for award in awards.sorted(by: { (Self.catalogOrder[$0.id] ?? .max) < (Self.catalogOrder[$1.id] ?? .max) }) {

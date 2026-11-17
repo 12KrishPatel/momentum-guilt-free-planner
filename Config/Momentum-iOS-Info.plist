@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyLists-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.krishpatel.momentum.deeplink</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>taskplanner</string>
+			</array>
+		</dict>
+	</array>
+	<!-- Guilt-Free Pass break timers on the Lock Screen and in the Dynamic Island -->
+	<key>NSSupportsLiveActivities</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<!-- Silent CloudKit pushes, so iCloud changes arrive while the app is in the background -->
+		<string>remote-notification</string>
+	</array>
+</dict>
+</plist>

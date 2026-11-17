@@ -31,39 +31,28 @@ enum DateChoice: String, CaseIterable, Identifiable {
     }
 }
 
-/// Creates a new task, or edits an existing one when initialized with `editing:`.
-struct AddTaskSheet: View {
-    @Environment(TaskStore.self) private var store
-    @Environment(\.dismiss) private var dismiss
-
-    private let editingTask: TaskItem?
-
-    @State private var title: String
-    @State private var notes: String
-    @State private var dateChoice: DateChoice
-    @State private var customDate: Date
-    @State private var effort: EffortLevel
-    @FocusState private var isTitleFocused: Bool
+/// Editable copy of a task's fields, shared by the iOS sheet and the macOS inspector.
+struct TaskDraft: Equatable {
+    var title = ""
+    var notes = ""
+    var dateChoice: DateChoice = .today
+    var customDate = Date.now
+    var effort: EffortLevel = .standard
 
     init(defaultDate: Date?) {
-        editingTask = nil
-        _title = State(initialValue: "")
-        _notes = State(initialValue: "")
-        _dateChoice = State(initialValue: DateChoice.matching(defaultDate))
-        _customDate = State(initialValue: defaultDate ?? .now)
-        _effort = State(initialValue: .standard)
+        dateChoice = DateChoice.matching(defaultDate)
+        customDate = defaultDate ?? .now
     }
 
-    init(editing task: TaskItem) {
-        editingTask = task
-        _title = State(initialValue: task.title)
-        _notes = State(initialValue: task.notes)
-        _dateChoice = State(initialValue: DateChoice.matching(task.scheduledDate))
-        _customDate = State(initialValue: task.scheduledDate ?? .now)
-        _effort = State(initialValue: task.effort)
+    init(task: TaskItem) {
+        title = task.title
+        notes = task.notes
+        dateChoice = DateChoice.matching(task.scheduledDate)
+        customDate = task.scheduledDate ?? .now
+        effort = task.effort
     }
 
-    private var resolvedDate: Date? {
+    var resolvedDate: Date? {
         let calendar = Calendar.current
         switch dateChoice {
         case .today: return calendar.dayOffset(0)
@@ -74,72 +63,121 @@ struct AddTaskSheet: View {
         }
     }
 
-    private var canSave: Bool {
+    var isValid: Bool {
         !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    /// Whether saving would change `task`.
+    func differs(from task: TaskItem) -> Bool {
+        title.trimmingCharacters(in: .whitespacesAndNewlines) != task.title
+            || notes.trimmingCharacters(in: .whitespacesAndNewlines) != task.notes
+            || resolvedDate != task.scheduledDate.map { Calendar.current.startOfDay(for: $0) }
+            || effort != task.effort
+    }
+}
+
+/// The title / notes, date and effort sections used to create or edit a task.
+/// Place inside a `Form`.
+struct TaskEditorFields: View {
+    @Binding var draft: TaskDraft
+    var titleFocus: FocusState<Bool>.Binding
+    var onSubmitTitle: () -> Void = {}
+
+    var body: some View {
+        Section {
+            TextField("Title", text: $draft.title, prompt: Text("What needs doing?"))
+                .labelsHidden()
+                .font(.headline)
+                .focused(titleFocus)
+                .submitLabel(.done)
+                .onSubmit(onSubmitTitle)
+            TextField("Notes", text: $draft.notes, prompt: Text("Notes (optional)"), axis: .vertical)
+                .labelsHidden()
+                .lineLimit(2...5)
+        }
+        .glassRow()
+
+        Section("When") {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(DateChoice.allCases) { choice in
+                        DateChip(choice: choice, isSelected: draft.dateChoice == choice) {
+                            withAnimation(Theme.spring) {
+                                draft.dateChoice = choice
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 4)
+            }
+            .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+
+            if draft.dateChoice == .custom {
+                DatePicker("Date", selection: $draft.customDate, displayedComponents: .date)
+            } else {
+                LabeledContent("Scheduled") {
+                    Text(draft.resolvedDate?.formatted(.dateTime.weekday(.wide).month().day()) ?? "Unscheduled backlog")
+                        .foregroundStyle(Theme.textSecondary)
+                }
+            }
+        }
+        .glassRow()
+
+        Section {
+            HStack(spacing: 10) {
+                ForEach(EffortLevel.allCases) { level in
+                    EffortOptionCard(level: level, isSelected: draft.effort == level) {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            draft.effort = level
+                        }
+                    }
+                }
+            }
+            .listRowInsets(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12))
+        } header: {
+            Text("Effort")
+        } footer: {
+            Text("Completing this task earns \(draft.effort.points) XP and \(draft.effort.points) Leisure Points.")
+                .contentTransition(.numericText())
+        }
+        .glassRow()
+        .sensoryFeedback(.selection, trigger: draft.dateChoice)
+        .sensoryFeedback(.selection, trigger: draft.effort)
+    }
+}
+
+/// Creates a new task, or edits an existing one when initialized with `editing:`.
+struct AddTaskSheet: View {
+    @Environment(TaskStore.self) private var store
+    @Environment(\.dismiss) private var dismiss
+
+    private let editingTask: TaskItem?
+
+    @State private var draft: TaskDraft
+    @FocusState private var isTitleFocused: Bool
+
+    init(defaultDate: Date?, effort: EffortLevel = .standard) {
+        editingTask = nil
+        var draft = TaskDraft(defaultDate: defaultDate)
+        draft.effort = effort
+        _draft = State(initialValue: draft)
+    }
+
+    init(editing task: TaskItem) {
+        editingTask = task
+        _draft = State(initialValue: TaskDraft(task: task))
     }
 
     var body: some View {
         NavigationStack {
             Form {
-                Section {
-                    TextField("What needs doing?", text: $title)
-                        .font(.headline)
-                        .focused($isTitleFocused)
-                        .submitLabel(.done)
-                    TextField("Notes (optional)", text: $notes, axis: .vertical)
-                        .lineLimit(2...5)
-                }
-                .glassRow()
-
-                Section("When") {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 8) {
-                            ForEach(DateChoice.allCases) { choice in
-                                DateChip(choice: choice, isSelected: dateChoice == choice) {
-                                    withAnimation(Theme.spring) {
-                                        dateChoice = choice
-                                    }
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 4)
-                    }
-                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
-
-                    if dateChoice == .custom {
-                        DatePicker("Date", selection: $customDate, displayedComponents: .date)
-                    } else {
-                        LabeledContent("Scheduled") {
-                            Text(resolvedDate?.formatted(.dateTime.weekday(.wide).month().day()) ?? "Unscheduled backlog")
-                                .foregroundStyle(Theme.textSecondary)
-                        }
-                    }
-                }
-                .glassRow()
-
-                Section {
-                    HStack(spacing: 10) {
-                        ForEach(EffortLevel.allCases) { level in
-                            EffortOptionCard(level: level, isSelected: effort == level) {
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                    effort = level
-                                }
-                            }
-                        }
-                    }
-                    .listRowInsets(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12))
-                } header: {
-                    Text("Effort")
-                } footer: {
-                    Text("Completing this task earns \(effort.points) XP and \(effort.points) Leisure Points.")
-                        .contentTransition(.numericText())
-                }
-                .glassRow()
+                TaskEditorFields(draft: $draft, titleFocus: $isTitleFocused)
             }
+            .formStyle(.grouped)
             .themedScreen()
             .navigationTitle(editingTask == nil ? "New Task" : "Edit Task")
-            .navigationBarTitleDisplayMode(.inline)
+            .inlineNavigationTitle()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -147,11 +185,9 @@ struct AddTaskSheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(editingTask == nil ? "Add" : "Save", action: save)
                         .fontWeight(.semibold)
-                        .disabled(!canSave)
+                        .disabled(!draft.isValid)
                 }
             }
-            .sensoryFeedback(.selection, trigger: dateChoice)
-            .sensoryFeedback(.selection, trigger: effort)
             .onAppear {
                 if editingTask == nil {
                     isTitleFocused = true
@@ -159,14 +195,15 @@ struct AddTaskSheet: View {
             }
         }
         .presentationDetents([.large])
+        .macSheetFrame()
     }
 
     private func save() {
-        guard canSave else { return }
+        guard draft.isValid else { return }
         if let editingTask {
-            store.update(editingTask, title: title, notes: notes, scheduledDate: resolvedDate, effort: effort)
+            store.update(editingTask, title: draft.title, notes: draft.notes, scheduledDate: draft.resolvedDate, effort: draft.effort)
         } else {
-            store.addTask(title: title, notes: notes, scheduledDate: resolvedDate, effort: effort)
+            store.addTask(title: draft.title, notes: draft.notes, scheduledDate: draft.resolvedDate, effort: draft.effort)
         }
         dismiss()
     }
@@ -174,7 +211,7 @@ struct AddTaskSheet: View {
 
 // MARK: - Components
 
-private struct DateChip: View {
+struct DateChip: View {
     let choice: DateChoice
     let isSelected: Bool
     let action: () -> Void
@@ -195,13 +232,14 @@ private struct DateChip: View {
                             .overlay(Capsule().strokeBorder(Theme.separator, lineWidth: 1))
                     }
                 }
+                .contentShape(Capsule())
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
-private struct EffortOptionCard: View {
+struct EffortOptionCard: View {
     let level: EffortLevel
     let isSelected: Bool
     let action: () -> Void
@@ -234,6 +272,7 @@ private struct EffortOptionCard: View {
                 }
             }
             .scaleEffect(isSelected ? 1.03 : 1)
+            .contentShape(shape)
         }
         .buttonStyle(.plain)
         .accessibilityLabel("\(level.label), \(level.points) XP")

@@ -1,25 +1,94 @@
 name: Momentum
 options:
-  bundleIdPrefix: com.example
+  bundleIdPrefix: com.krishpatel
   deploymentTarget:
     iOS: "17.0"
+    macOS: "14.0"
   createIntermediateGroups: true
+settings:
+  base:
+    DEVELOPMENT_TEAM: C66WHXJG96
+    CODE_SIGN_STYLE: Automatic
 targets:
   Momentum:
     type: application
-    platform: iOS
+    # One multiplatform target: native iPhone and native Mac from the same sources.
+    supportedDestinations: [iOS, macOS]
+    platform: auto
     sources:
-      - Momentum
+      - path: Momentum
+        excludes:
+          - "*.entitlements"
+    dependencies:
+      - target: TaskPlannerWidgets
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.example.momentum
+        PRODUCT_BUNDLE_IDENTIFIER: com.krishpatel.momentum
+        PRODUCT_NAME: Momentum
         SWIFT_VERSION: "6.0"
         SWIFT_STRICT_CONCURRENCY: complete
         GENERATE_INFOPLIST_FILE: YES
+        # Merged into the generated Info.plist: registers the taskplanner:// URL scheme.
+        INFOPLIST_FILE: Config/Momentum-Info.plist
+        # iOS adds remote-notification background mode for iCloud sync pushes.
+        "INFOPLIST_FILE[sdk=iphone*]": Config/Momentum-iOS-Info.plist
+        # No custom encryption: skips the export-compliance question on every TestFlight build.
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_CFBundleDisplayName: Momentum
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
-        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
-        MARKETING_VERSION: "1.0"
-        CURRENT_PROJECT_VERSION: "1"
-        TARGETED_DEVICE_FAMILY: "1"
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+        MARKETING_VERSION: "3.1"
+        CURRENT_PROJECT_VERSION: "4"
         ENABLE_PREVIEWS: YES
+        SUPPORTS_MACCATALYST: NO
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+        SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
+        # iOS
+        TARGETED_DEVICE_FAMILY: "1"
+        "INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphone*]": YES
+        "INFOPLIST_KEY_UISupportedInterfaceOrientations[sdk=iphone*]": UIInterfaceOrientationPortrait
+        # App Group shared with the widget extension; iCloud (CloudKit) + push for sync
+        "CODE_SIGN_ENTITLEMENTS[sdk=iphone*]": Momentum/Momentum-iOS.entitlements
+        # macOS: App Sandbox + outgoing network (required for iCloud / CloudKit sync) + App Group
+        "CODE_SIGN_ENTITLEMENTS[sdk=macosx*]": Momentum/Momentum-macOS.entitlements
+
+  # WidgetKit extension: Focus Glance (small), Today's Queue (medium), Command Center (large).
+  # Compiles the shared model, engine and intent files so widgets read and write the same store.
+  TaskPlannerWidgets:
+    type: app-extension
+    supportedDestinations: [iOS, macOS]
+    platform: auto
+    sources:
+      - path: TaskPlannerWidgets
+        excludes:
+          - "*.entitlements"
+      - Momentum/Models.swift
+      - Momentum/Theme.swift
+      - Momentum/TaskStore.swift
+      - Momentum/AwardEngine.swift
+      - Momentum/RewardEngine.swift
+      - Momentum/NotificationManager.swift
+      - Momentum/PlatformHelpers.swift
+      - Momentum/SharedModelContainer.swift
+      - Momentum/WidgetIntents.swift
+      - Momentum/ComboEngine.swift
+      - Momentum/BreakPassAttributes.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.krishpatel.momentum.widgets
+        PRODUCT_NAME: TaskPlannerWidgets
+        SWIFT_VERSION: "6.0"
+        SWIFT_STRICT_CONCURRENCY: complete
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) WIDGET_EXTENSION"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_FILE: Config/TaskPlannerWidgets-Info.plist
+        INFOPLIST_KEY_CFBundleDisplayName: Momentum Widgets
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+        MARKETING_VERSION: "3.1"
+        CURRENT_PROJECT_VERSION: "4"
+        SKIP_INSTALL: YES
+        ENABLE_PREVIEWS: YES
+        TARGETED_DEVICE_FAMILY: "1"
+        SUPPORTS_MACCATALYST: NO
+        "CODE_SIGN_ENTITLEMENTS[sdk=iphone*]": TaskPlannerWidgets/TaskPlannerWidgets-iOS.entitlements
+        "CODE_SIGN_ENTITLEMENTS[sdk=macosx*]": TaskPlannerWidgets/TaskPlannerWidgets-macOS.entitlements

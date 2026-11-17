@@ -11,20 +11,40 @@ enum TrophyTab: String, CaseIterable, Identifiable {
 struct AwardsView: View {
     @Query private var awards: [Award]
     @Query private var tasks: [TaskItem]
-    @State private var tab: TrophyTab = .badges
+    @State private var tab: TrophyTab
     @State private var selectedAward: Award?
+
+    /// When set (the macOS sidebar), shows only this section and hides the switcher.
+    private let fixedTab: TrophyTab?
+
+    init(fixedTab: TrophyTab? = nil) {
+        self.fixedTab = fixedTab
+        _tab = State(initialValue: fixedTab ?? .badges)
+    }
+
+    private var currentTab: TrophyTab { fixedTab ?? tab }
+
+    private var title: String {
+        switch fixedTab {
+        case .badges: "Trophy Case"
+        case .rewards: "Leisure Rewards"
+        case nil: "Awards"
+        }
+    }
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
-                    Picker("Section", selection: $tab) {
-                        Text("Badges (\(awards.count))").tag(TrophyTab.badges)
-                        Text("Leisure Rewards").tag(TrophyTab.rewards)
+                    if fixedTab == nil {
+                        Picker("Section", selection: $tab) {
+                            Text("Badges (\(awards.count))").tag(TrophyTab.badges)
+                            Text("Leisure Rewards").tag(TrophyTab.rewards)
+                        }
+                        .pickerStyle(.segmented)
                     }
-                    .pickerStyle(.segmented)
 
-                    switch tab {
+                    switch currentTab {
                     case .badges:
                         BadgeCollectionView(
                             awards: awards,
@@ -38,11 +58,13 @@ struct AwardsView: View {
                             .transition(.opacity.combined(with: .move(edge: .trailing)))
                     }
                 }
-                .padding(16)
+                .padding(Platform.isMac ? 24 : 16)
+                .frame(maxWidth: Platform.isMac ? 980 : .infinity)
+                .frame(maxWidth: .infinity)
                 .animation(Theme.spring, value: tab)
             }
             .themedScreen()
-            .navigationTitle("Awards")
+            .navigationTitle(title)
             .sheet(item: $selectedAward) { award in
                 AwardDetailSheet(award: award)
             }
@@ -412,7 +434,7 @@ struct AwardDetailSheet: View {
                 .padding(20)
             }
             .themedScreen()
-            .navigationBarTitleDisplayMode(.inline)
+            .inlineNavigationTitle()
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
@@ -422,6 +444,7 @@ struct AwardDetailSheet: View {
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
         .presentationBackground(Theme.obsidianBottom)
+        .macSheetFrame(width: 440, height: 620)
     }
 
     private func detailBlock(title: String, icon: String, text: String) -> some View {
