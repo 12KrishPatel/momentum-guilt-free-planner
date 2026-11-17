@@ -9,82 +9,65 @@ enum PlanScope: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
+/// Requests routed into the Plan tab from outside it (e.g. a widget deep link).
+@MainActor
+@Observable
+final class PlanRouter {
+    /// Set to open Today with the Add Task sheet; PlanView clears it once handled.
+    var pendingQuickAdd = false
+    /// Effort to pre-select in that sheet (from a widget chip).
+    var pendingQuickAddEffort: EffortLevel?
+}
+
 struct PlanView: View {
+    @Environment(PlanRouter.self) private var router: PlanRouter?
     @Environment(TaskStore.self) private var store
     @Environment(\.scenePhase) private var scenePhase
     @Query(sort: \TaskItem.createdAt) private var tasks: [TaskItem]
     @Query(sort: \RewardCheckpoint.cost) private var rewards: [RewardCheckpoint]
     @Query private var redemptions: [RewardRedemption]
+    @Query private var events: [MomentumEvent]
+    @Environment(ComboEngine.self) private var combo: ComboEngine?
 
     @State private var scope: PlanScope = .today
     @State private var selectedDay = Calendar.current.startOfDay(for: .now)
     @State private var isAddingTask = false
+    /// Effort pre-selected by a widget deep link for the next Add Task sheet.
+    @State private var newTaskEffort: EffortLevel = .standard
     @State private var editingTask: TaskItem?
     @State private var reschedulingTask: TaskItem?
     @State private var presentedPass: RewardRedemption?
+    @State private var activeRitual: RitualMode?
 
     private var calendar: Calendar { .current }
-    private var today: Date { calendar.startOfDay(for: .now) }
-    private var weekDays: [Date] { (0..<7).map { calendar.dayOffset($0, from: today) } }
-    private var weekEnd: Date { calendar.dayOffset(7, from: today) }
+    private var plan: PlanModel { PlanModel(tasks: tasks) }
+    private var today: Date { plan.today }
+    private var weekDays: [Date] { plan.weekDays }
+    private var weekEnd: Date { plan.weekEnd }
+    private var overdueTasks: [TaskItem] { plan.overdue }
+    private func tasks(on day: Date) -> [TaskItem] { plan.tasks(on: day) }
+    private var weekTasks: [TaskItem] { plan.weekTasks }
+    private var laterTasks: [TaskItem] { plan.later }
+    private var somedayTasks: [TaskItem] { plan.someday }
+    private var weekSummaries: [Date: DaySummary] { plan.weekSummaries }
 
-    // MARK: Derived collections
-
-    private var overdueTasks: [TaskItem] {
-        ordered(tasks.filter { $0.isOverdue() })
-    }
-
-    private func tasks(on day: Date) -> [TaskItem] {
-        ordered(tasks.filter { $0.isScheduled(on: day, calendar: calendar) })
-    }
-
-    private var weekTasks: [TaskItem] {
-        tasks.filter { task in
-            guard let date = task.scheduledDate else { return false }
-            return date >= today && date < weekEnd
-        }
-    }
-
-    private var laterTasks: [TaskItem] {
-        tasks
-            .filter { task in
-                guard let date = task.scheduledDate else { return false }
-                return date >= weekEnd
+    /// Deep link from the widget: show Today and open the Add Task sheet, closing any other
+    /// sheet first (SwiftUI presents one sheet at a time).
+    private func openQuickAdd(effort: EffortLevel?) {
+        let hadOtherSheet = editingTask != nil || reschedulingTask != nil || presentedPass != nil || activeRitual != nil
+        editingTask = nil
+        reschedulingTask = nil
+        presentedPass = nil
+        activeRitual = nil
+        scope = .today
+        selectedDay = today
+        guard !isAddingTask else { return }
+        newTaskEffort = effort ?? .standard
+        Task {
+            if hadOtherSheet {
+                try? await Task.sleep(for: .milliseconds(450))
             }
-            .sorted { lhs, rhs in
-                let l = lhs.scheduledDate ?? .distantFuture
-                let r = rhs.scheduledDate ?? .distantFuture
-                return l == r ? lhs.createdAt < rhs.createdAt : l < r
-            }
-    }
-
-    /// Backlog: open items, plus anything checked off today so it doesn't vanish mid-session.
-    private var somedayTasks: [TaskItem] {
-        ordered(tasks.filter { task in
-            guard task.scheduledDate == nil else { return false }
-            guard task.isCompleted else { return true }
-            return task.completedAt.map { calendar.isDateInToday($0) } ?? false
-        })
-    }
-
-    private var weekSummaries: [Date: DaySummary] {
-        var summaries: [Date: DaySummary] = [:]
-        for task in weekTasks {
-            guard let date = task.scheduledDate else { continue }
-            let day = calendar.startOfDay(for: date)
-            summaries[day, default: DaySummary()].total += 1
-            if task.isCompleted {
-                summaries[day, default: DaySummary()].completed += 1
-            }
-        }
-        return summaries
-    }
-
-    private func ordered(_ items: [TaskItem]) -> [TaskItem] {
-        items.sorted { lhs, rhs in
-            if lhs.isCompleted != rhs.isCompleted { return !lhs.isCompleted }
-            if lhs.effort.rank != rhs.effort.rank { return lhs.effort.rank > rhs.effort.rank }
-            return lhs.createdAt < rhs.createdAt
+            isAddingTask = true
         }
     }
 
@@ -109,10 +92,22 @@ struct PlanView: View {
                     }
                     .pickerStyle(.segmented)
 
+                    RitualPromptSlot { mode in activeRitual = mode }
+
+                    if (combo?.activeMultiplier ?? 1) > 1 {
+                        HStack {
+                            ComboBadgeSlot()
+                            Spacer(minLength: 0)
+                        }
+                        // Room for the glow, which the list row would otherwise clip.
+                        .padding(.vertical, 14)
+                        .padding(.horizontal, 6)
+                    }
+
                     headerCard
 
                     NextCheckpointBar(
-                        status: RewardMath.nextCheckpoint(checkpoints: rewards, tasks: tasks, redemptions: redemptions)
+                        status: RewardMath.nextCheckpoint(checkpoints: rewards, tasks: tasks, redemptions: redemptions, events: events)
                     ) { checkpoint in
                         if let pass = store.claimDailyCheckpoint(checkpoint) {
                             presentedPass = pass
@@ -122,6 +117,7 @@ struct PlanView: View {
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets(top: 6, leading: 0, bottom: 6, trailing: 0))
+                .animation(Theme.spring, value: combo?.activeMultiplier)
 
                 switch scope {
                 case .today: todaySections
@@ -129,13 +125,25 @@ struct PlanView: View {
                 case .upcoming: upcomingSections
                 }
             }
-            .listStyle(.insetGrouped)
+            .groupedListStyle()
             .themedScreen()
             .contentMargins(.bottom, 96, for: .scrollContent)
             .navigationTitle("Plan")
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Menu {
+                        Section("Rituals") {
+                            RitualMenuItems { mode in activeRitual = mode }
+                        }
+                    } label: {
+                        Label("Rituals", systemImage: "rectangle.stack.fill")
+                    }
+                }
+            }
+            .xpBurstOverlay()
             .overlay(alignment: .bottomTrailing) { addButton }
-            .sheet(isPresented: $isAddingTask) {
-                AddTaskSheet(defaultDate: defaultDateForNewTask)
+            .sheet(isPresented: $isAddingTask, onDismiss: { newTaskEffort = .standard }) {
+                AddTaskSheet(defaultDate: defaultDateForNewTask, effort: newTaskEffort)
             }
             .sheet(item: $editingTask) { task in
                 AddTaskSheet(editing: task)
@@ -146,7 +154,16 @@ struct PlanView: View {
             .sheet(item: $presentedPass) { pass in
                 GuiltFreePassView(redemption: pass)
             }
+            .sheet(item: $activeRitual) { mode in
+                RitualFlowView(mode: mode)
+            }
             .sensoryFeedback(.selection, trigger: scope)
+            .onChange(of: router?.pendingQuickAdd ?? false, initial: true) { _, isPending in
+                guard isPending else { return }
+                router?.pendingQuickAdd = false
+                openQuickAdd(effort: router?.pendingQuickAddEffort)
+                router?.pendingQuickAddEffort = nil
+            }
             .onChange(of: scenePhase) { _, phase in
                 // After a day rollover the strip's old selection may no longer be in range.
                 if phase == .active, selectedDay < today || selectedDay >= weekEnd {
@@ -164,8 +181,8 @@ struct PlanView: View {
             title: scope == .today ? "Today's Progress" : "This Week's Progress",
             completed: scoped.count(where: \.isCompleted),
             total: scoped.count,
-            totalXP: PlannerStats.totalXP(tasks),
-            points: RewardMath.balance(tasks: tasks, redemptions: redemptions),
+            totalXP: PlannerStats.totalXP(tasks, events: events),
+            points: RewardMath.balance(tasks: tasks, redemptions: redemptions, events: events),
             streak: PlannerStats.currentStreak(tasks)
         )
     }
@@ -326,6 +343,9 @@ struct PlanView: View {
                 }
                 .tint(Theme.cyan)
             }
+            .contextMenu {
+                TaskContextMenuItems(task: task)
+            }
         }
     }
 
@@ -346,6 +366,7 @@ struct PlanView: View {
         .padding(.trailing, 20)
         .padding(.bottom, 18)
         .accessibilityLabel("Add task")
+        .keyboardShortcut("n", modifiers: .command)
         .sensoryFeedback(.impact(weight: .medium), trigger: isAddingTask) { _, isPresented in isPresented }
     }
 }
@@ -584,8 +605,9 @@ struct RescheduleSheet: View {
                 .glassRow()
             }
             .themedScreen()
+            .formStyle(.grouped)
             .navigationTitle("Reschedule")
-            .navigationBarTitleDisplayMode(.inline)
+            .inlineNavigationTitle()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -599,6 +621,102 @@ struct RescheduleSheet: View {
             }
         }
         .presentationDetents([.large])
+        .macSheetFrame(width: 420, height: 560)
+    }
+}
+
+// MARK: - Plan model
+
+/// Groups tasks into the Plan views' buckets. Shared by the iOS Plan tab, the macOS
+/// workspace and the macOS sidebar's remaining-task badges.
+struct PlanModel {
+    let tasks: [TaskItem]
+    let today: Date
+    let calendar: Calendar
+
+    init(tasks: [TaskItem], now: Date = .now, calendar: Calendar = .current) {
+        self.tasks = tasks
+        self.calendar = calendar
+        self.today = calendar.startOfDay(for: now)
+    }
+
+    var weekDays: [Date] { (0..<7).map { calendar.dayOffset($0, from: today) } }
+    var weekEnd: Date { calendar.dayOffset(7, from: today) }
+
+    var overdue: [TaskItem] {
+        Self.ordered(tasks.filter { $0.isOverdue(asOf: today, calendar: calendar) })
+    }
+
+    func tasks(on day: Date) -> [TaskItem] {
+        Self.ordered(tasks.filter { $0.isScheduled(on: day, calendar: calendar) })
+    }
+
+    /// Scheduled from today through the next 6 days.
+    var weekTasks: [TaskItem] {
+        tasks.filter { task in
+            guard !task.isArchived, let date = task.scheduledDate else { return false }
+            return date >= today && date < weekEnd
+        }
+    }
+
+    /// Scheduled more than 7 days out, soonest first.
+    var later: [TaskItem] {
+        tasks
+            .filter { task in
+                guard !task.isArchived, let date = task.scheduledDate else { return false }
+                return date >= weekEnd
+            }
+            .sorted { lhs, rhs in
+                let l = lhs.scheduledDate ?? .distantFuture
+                let r = rhs.scheduledDate ?? .distantFuture
+                return l == r ? lhs.createdAt < rhs.createdAt : l < r
+            }
+    }
+
+    /// Backlog: open items, plus anything checked off today so it doesn't vanish mid-session.
+    var someday: [TaskItem] {
+        Self.ordered(tasks.filter { task in
+            guard !task.isArchived, task.scheduledDate == nil else { return false }
+            guard task.isCompleted else { return true }
+            return task.completedAt.map { calendar.isDate($0, inSameDayAs: today) } ?? false
+        })
+    }
+
+    var weekSummaries: [Date: DaySummary] {
+        var summaries: [Date: DaySummary] = [:]
+        for task in weekTasks {
+            guard let date = task.scheduledDate else { continue }
+            let day = calendar.startOfDay(for: date)
+            summaries[day, default: DaySummary()].total += 1
+            if task.isCompleted {
+                summaries[day, default: DaySummary()].completed += 1
+            }
+        }
+        return summaries
+    }
+
+    /// Open tasks for a scope (Today includes overdue).
+    func remainingCount(for scope: PlanScope) -> Int {
+        switch scope {
+        case .today: (overdue + tasks(on: today)).count { !$0.isCompleted }
+        case .week: weekTasks.count { !$0.isCompleted }
+        case .upcoming: (later + someday).count { !$0.isCompleted }
+        }
+    }
+
+    /// Incomplete first, then the Morning Kickoff priority order, then highest effort, then oldest.
+    static func ordered(_ items: [TaskItem]) -> [TaskItem] {
+        items.sorted { lhs, rhs in
+            if lhs.isCompleted != rhs.isCompleted { return !lhs.isCompleted }
+            switch (lhs.priorityRank, rhs.priorityRank) {
+            case let (l?, r?) where l != r: return l < r
+            case (.some, nil): return true
+            case (nil, .some): return false
+            default: break
+            }
+            if lhs.effort.rank != rhs.effort.rank { return lhs.effort.rank > rhs.effort.rank }
+            return lhs.createdAt < rhs.createdAt
+        }
     }
 }
 

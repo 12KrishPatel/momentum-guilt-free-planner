@@ -142,3 +142,50 @@ struct TaskRowView: View {
     .themedScreen()
     .previewEnvironment()
 }
+
+// MARK: - Context menu
+
+/// Right-click (macOS) / long-press (iOS) actions for a task row.
+struct TaskContextMenuItems: View {
+    let task: TaskItem
+    @Environment(TaskStore.self) private var store
+
+    var body: some View {
+        Button {
+            withAnimation(Theme.spring) { store.toggleCompletion(task) }
+        } label: {
+            Label(task.isCompleted ? "Mark Incomplete" : "Complete",
+                  systemImage: task.isCompleted ? "arrow.uturn.backward.circle" : "checkmark.circle")
+        }
+
+        Divider()
+
+        Button {
+            withAnimation(Theme.spring) { store.reschedule(task, byDaysFromToday: 1) }
+        } label: {
+            Label("Move to Tomorrow", systemImage: "sunrise")
+        }
+
+        Button {
+            withAnimation(Theme.spring) { store.reschedule(task, byDaysFromToday: 7) }
+        } label: {
+            Label("Move to Next Week", systemImage: "calendar.badge.plus")
+        }
+
+        if task.scheduledDate != nil {
+            Button {
+                withAnimation(Theme.spring) { store.reschedule(task, to: nil) }
+            } label: {
+                Label("Move to Someday", systemImage: "tray")
+            }
+        }
+
+        Divider()
+
+        Button(role: .destructive) {
+            withAnimation(Theme.spring) { store.delete(task) }
+        } label: {
+            Label("Delete", systemImage: "trash")
+        }
+    }
+}

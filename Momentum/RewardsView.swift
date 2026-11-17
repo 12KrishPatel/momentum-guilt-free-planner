@@ -8,16 +8,18 @@ struct RewardsView: View {
     @Query(sort: \RewardCheckpoint.cost) private var rewards: [RewardCheckpoint]
     @Query(sort: \RewardRedemption.redeemedAt, order: .reverse) private var redemptions: [RewardRedemption]
     @Query private var tasks: [TaskItem]
+    @Query private var events: [MomentumEvent]
 
     @State private var pendingRedemption: RewardCheckpoint?
     @State private var presentedPass: RewardRedemption?
+    @State private var openingCrate: MysteryCrate?
     @State private var isAddingReward = false
     @State private var rewardToDelete: RewardCheckpoint?
 
-    private var lifetimeXP: Int { PlannerStats.totalXP(tasks) }
+    private var lifetimeXP: Int { PlannerStats.totalXP(tasks, events: events) }
     private var spent: Int { RewardMath.pointsSpent(redemptions) }
-    private var balance: Int { RewardMath.balance(tasks: tasks, redemptions: redemptions) }
-    private var todayXP: Int { PlannerStats.xpEarned(on: .now, tasks: tasks) }
+    private var balance: Int { RewardMath.balance(tasks: tasks, redemptions: redemptions, events: events) }
+    private var todayXP: Int { PlannerStats.xpEarned(on: .now, tasks: tasks, events: events) }
     private var dailies: [RewardCheckpoint] { rewards.filter { $0.kind == .dailyCheckpoint } }
     private var shop: [RewardCheckpoint] {
         rewards
@@ -27,7 +29,17 @@ struct RewardsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 26) {
+            MysteryVaultView(balance: balance) { crate in
+                openingCrate = crate
+            }
+
             LeisureBalanceCard(balance: balance, lifetimeXP: lifetimeXP, spent: spent, todayXP: todayXP)
+
+            SavedPassesSection { pass in
+                if let id = pass.redemptionID, let redemption = redemptions.first(where: { $0.id == id }) {
+                    presentedPass = redemption
+                }
+            }
 
             VStack(alignment: .leading, spacing: 12) {
                 SectionTitle("Today's Checkpoints", subtitle: "Hit today's XP targets to unlock free breaks. Resets daily.")
@@ -108,6 +120,9 @@ struct RewardsView: View {
         .sheet(item: $presentedPass) { pass in
             GuiltFreePassView(redemption: pass)
         }
+        .sheet(item: $openingCrate) { crate in
+            CrateOpeningModal(crate: crate)
+        }
         .sheet(isPresented: $isAddingReward) {
             AddRewardSheet()
         }
@@ -178,7 +193,7 @@ struct LeisureBalanceCard: View {
                 metric(title: "Today", value: todayXP)
             }
 
-            Text("Every task earns points 1:1 with its XP—Quick 10, Standard 25, Deep Work 50.")
+            Text("Every task earns points 1:1 with its XP—Quick 10, Standard 25, Deep Work 50. Combos multiply both.")
                 .font(.caption)
                 .foregroundStyle(Theme.textTertiary)
         }
@@ -320,6 +335,11 @@ struct RewardShopCard: View {
                         .foregroundStyle(Theme.textSecondary)
                         .lineLimit(2)
                 }
+                if let minutes = reward.breakMinutes {
+                    Label("\(BreakPolicy.label(for: minutes)) timed break", systemImage: "timer")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(Theme.emerald)
+                }
                 if !canAfford {
                     GradientProgressBar(value: Double(balance) / Double(max(reward.cost, 1)), colors: colors, height: 4)
                         .padding(.top, 2)
@@ -366,7 +386,8 @@ struct PassHistoryRow: View {
         HStack(spacing: 12) {
             GradientIcon(
                 systemName: redemption.iconName,
-                colors: redemption.kind == .dailyCheckpoint ? Theme.successColors : Theme.primaryColors,
+                colors: redemption.kind == .dailyCheckpoint ? Theme.successColors
+                    : redemption.kind == .mysteryCrate ? Theme.legendaryColors : Theme.primaryColors,
                 size: 32
             )
             VStack(alignment: .leading, spacing: 2) {
@@ -402,6 +423,8 @@ struct AddRewardSheet: View {
     @State private var notes = ""
     @State private var cost = 100
     @State private var iconName = RewardCatalog.customIcons[0]
+    @State private var isTimed = false
+    @State private var durationMinutes = BreakPolicy.minimumMinutes
     @FocusState private var isTitleFocused: Bool
 
     private let presets = [25, 50, 100, 250, 500]
@@ -494,17 +517,41 @@ struct AddRewardSheet: View {
                     Text("For scale: a Standard task earns 25 points, a Deep Work task 50.")
                 }
                 .glassRow()
+
+                Section {
+                    Toggle("Timed break", isOn: $isTimed.animation(Theme.spring))
+                    if isTimed {
+                        Stepper(value: $durationMinutes, in: BreakPolicy.minimumMinutes...480, step: 15) {
+                            Text(BreakPolicy.label(for: durationMinutes))
+                                .font(Theme.rounded(.headline))
+                                .foregroundStyle(Theme.successGradient)
+                                .monospacedDigit()
+                        }
+                    }
+                } header: {
+                    Text("Break Timer")
+                } footer: {
+                    Text("Timed passes can start a countdown (on iPhone, in the Dynamic Island). Breaks are at least 30 minutes.")
+                }
+                .glassRow()
             }
+            .formStyle(.grouped)
             .themedScreen()
             .navigationTitle("Custom Reward")
-            .navigationBarTitleDisplayMode(.inline)
+            .inlineNavigationTitle()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add") {
-                        store.addCustomReward(title: title, details: notes, iconName: iconName, cost: cost)
+                        store.addCustomReward(
+                            title: title,
+                            details: notes,
+                            iconName: iconName,
+                            cost: cost,
+                            durationMinutes: isTimed ? max(BreakPolicy.minimumMinutes, durationMinutes) : nil
+                        )
                         dismiss()
                     }
                     .fontWeight(.semibold)
@@ -515,6 +562,7 @@ struct AddRewardSheet: View {
             .sensoryFeedback(.selection, trigger: cost)
             .onAppear { isTitleFocused = true }
         }
+        .macSheetFrame(width: 480, height: 720)
     }
 }
 

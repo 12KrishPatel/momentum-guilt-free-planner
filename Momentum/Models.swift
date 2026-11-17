@@ -167,21 +167,114 @@ enum RewardKind: String, Codable, CaseIterable, Sendable {
     case dailyCheckpoint
     /// Bought with spendable Leisure Points.
     case shopReward
+    /// Won from a Mystery Loot Box (the redemption records the crate's price).
+    case mysteryCrate
+}
+
+/// The 30-minute minimum break standard: every timed leisure reward, crate drop and Live
+/// Activity lasts at least this long.
+enum BreakPolicy {
+    static let minimumMinutes = 30
+
+    /// `nil` stays `nil` (an untimed reward); anything else is raised to the minimum.
+    static func clamped(_ minutes: Int?) -> Int? {
+        minutes.map { max(minimumMinutes, $0) }
+    }
+
+    /// "30 min", "1 hr", "90 min", "4 hr".
+    static func label(for minutes: Int) -> String {
+        minutes >= 60 && minutes % 60 == 0 ? "\(minutes / 60) hr" : "\(minutes) min"
+    }
+}
+
+/// How rare a Guilt-Free Pass is; drives crate styling.
+enum PassRarity: String, Codable, CaseIterable, Sendable, Comparable {
+    case common
+    case rare
+    case epic
+    case legendary
+
+    var title: String {
+        switch self {
+        case .common: "Common"
+        case .rare: "Rare"
+        case .epic: "Epic"
+        case .legendary: "Legendary"
+        }
+    }
+
+    var rank: Int {
+        switch self {
+        case .common: 0
+        case .rare: 1
+        case .epic: 2
+        case .legendary: 3
+        }
+    }
+
+    static func < (lhs: PassRarity, rhs: PassRarity) -> Bool { lhs.rank < rhs.rank }
+
+    var colors: [Color] {
+        switch self {
+        case .common: [Color(hex: 0x94A3B8), Color(hex: 0x475569)]
+        case .rare: Theme.successColors
+        case .epic: Theme.primaryColors
+        case .legendary: Theme.legendaryColors
+        }
+    }
+
+    var glowColor: Color { colors.last ?? Theme.violet }
+}
+
+/// Where a saved pass came from.
+enum PassSource: String, Codable, Sendable {
+    case dailyCheckpoint
+    case shop
+    case mysteryCrate
+}
+
+/// Non-task events that matter to XP, combos or badges.
+enum MomentumEventKind: String, Codable, CaseIterable, Sendable {
+    /// Finished the Sunday Reset ritual (+25 XP).
+    case sundayReset
+    /// Finished the Morning Kickoff ritual (+25 XP).
+    case morningKickoff
+    /// Cleared 100% of today's tasks before 5 PM: 1.5x for the rest of the day (0 XP itself).
+    case earlyFinisher
+
+    var title: String {
+        switch self {
+        case .sundayReset: "Sunday Reset"
+        case .morningKickoff: "Morning Kickoff"
+        case .earlyFinisher: "Early Finisher Bonus"
+        }
+    }
 }
 
 // MARK: - SwiftData models
 
+// CloudKit-compatible models: every attribute has a default or is optional, and there are
+// no `.unique` constraints (CloudKit can't enforce them). Duplicates that can appear when
+// two devices seed the same data are merged in `AwardEngine` / `RewardCatalog`.
+
 @Model
 final class TaskItem {
-    @Attribute(.unique) var id: UUID
-    var title: String
-    var notes: String
+    var id: UUID = UUID()
+    var title: String = ""
+    var notes: String = ""
     /// `nil` means the task lives in the unscheduled "Someday" backlog.
     var scheduledDate: Date?
-    var isCompleted: Bool
+    var isCompleted: Bool = false
     var completedAt: Date?
-    var effort: EffortLevel
-    var createdAt: Date
+    var effort: EffortLevel = EffortLevel.standard
+    var createdAt: Date = Date.now
+    // Added in V4 (optional, so older rows and CloudKit records decode as "not set").
+    /// Combo multiplier locked in when the task was completed (1.0, 1.5 or 2.0).
+    var storedXPMultiplier: Double?
+    /// Set when the Sunday Reset clears the task: it leaves every list but isn't deleted.
+    var archivedAt: Date?
+    /// Order chosen in Morning Kickoff (lower first) for tasks of the same day.
+    var priorityRank: Int?
 
     init(
         id: UUID = UUID(),
@@ -203,29 +296,41 @@ final class TaskItem {
         self.createdAt = createdAt
     }
 
+    var isArchived: Bool { archivedAt != nil }
+
     func isScheduled(on day: Date, calendar: Calendar = .current) -> Bool {
-        guard let scheduledDate else { return false }
+        guard !isArchived, let scheduledDate else { return false }
         return calendar.isDate(scheduledDate, inSameDayAs: day)
     }
 
-    /// Incomplete and scheduled before the start of today.
+    /// Incomplete, not archived, and scheduled before the start of today.
     func isOverdue(asOf now: Date = .now, calendar: Calendar = .current) -> Bool {
-        guard !isCompleted, let scheduledDate else { return false }
+        guard !isCompleted, !isArchived, let scheduledDate else { return false }
         return scheduledDate < calendar.startOfDay(for: now)
+    }
+
+    var xpMultiplier: Double { storedXPMultiplier ?? 1 }
+
+    /// XP (and Leisure Points) this task earned: its effort value times the combo multiplier
+    /// it was completed under, rounded. Zero while incomplete.
+    var earnedXP: Int {
+        guard isCompleted else { return 0 }
+        return ComboMath.apply(xpMultiplier, to: effort.points)
     }
 }
 
 @Model
 final class Award {
-    @Attribute(.unique) var id: String
-    var title: String
-    var details: String
-    var category: AwardCategory
-    var iconName: String
-    var isUnlocked: Bool
+    /// Catalog slug, e.g. `"week_warrior"`.
+    var id: String = ""
+    var title: String = ""
+    var details: String = ""
+    var category: AwardCategory = AwardCategory.consistency
+    var iconName: String = "star.fill"
+    var isUnlocked: Bool = false
     var unlockedDate: Date?
-    var currentProgress: Int
-    var targetProgress: Int
+    var currentProgress: Int = 0
+    var targetProgress: Int = 1
     // Added in V2. Stored as optionals so rows from a V1 store (which have NULL here
     // after lightweight migration) decode safely; use `tier` / `isSecret` instead.
     var storedTier: AwardTier?
@@ -279,18 +384,20 @@ final class Award {
 /// A real-world reward: either a daily XP checkpoint or a shop item bought with Leisure Points.
 @Model
 final class RewardCheckpoint {
-    @Attribute(.unique) var id: UUID
+    var id: UUID = UUID()
     /// Stable identifier for built-in rewards; empty for user-created ones.
-    var slug: String
-    var title: String
-    var details: String
-    var iconName: String
+    var slug: String = ""
+    var title: String = ""
+    var details: String = ""
+    var iconName: String = "gift.fill"
     /// Points spent (shop) or XP needed today (daily checkpoint).
-    var cost: Int
-    var kind: RewardKind
-    var isCustom: Bool
-    var sortOrder: Int
-    var createdAt: Date
+    var cost: Int = 0
+    var kind: RewardKind = RewardKind.shopReward
+    var isCustom: Bool = false
+    var sortOrder: Int = 0
+    var createdAt: Date = Date.now
+    /// Break length for timed rewards (at least 30); `nil` for untimed ones like Takeout Night.
+    var durationMinutes: Int?
 
     init(
         id: UUID = UUID(),
@@ -302,7 +409,8 @@ final class RewardCheckpoint {
         kind: RewardKind,
         isCustom: Bool,
         sortOrder: Int = 0,
-        createdAt: Date = .now
+        createdAt: Date = .now,
+        durationMinutes: Int? = nil
     ) {
         self.id = id
         self.slug = slug
@@ -314,22 +422,28 @@ final class RewardCheckpoint {
         self.isCustom = isCustom
         self.sortOrder = sortOrder
         self.createdAt = createdAt
+        self.durationMinutes = BreakPolicy.clamped(durationMinutes)
     }
+
+    /// Break length with the 30-minute minimum applied.
+    var breakMinutes: Int? { BreakPolicy.clamped(durationMinutes) }
 }
 
 /// A claimed reward, shown as a timestamped "Guilt-Free Pass". Copies the reward's
 /// details so the pass survives the reward being edited or deleted.
 @Model
 final class RewardRedemption {
-    @Attribute(.unique) var id: UUID
+    var id: UUID = UUID()
     var rewardID: UUID?
-    var title: String
-    var details: String
-    var iconName: String
+    var title: String = ""
+    var details: String = ""
+    var iconName: String = "ticket.fill"
     /// Leisure Points spent (0 for daily checkpoints).
-    var pointsSpent: Int
-    var kind: RewardKind
-    var redeemedAt: Date
+    var pointsSpent: Int = 0
+    var kind: RewardKind = RewardKind.shopReward
+    var redeemedAt: Date = Date.now
+    /// Break length copied from the reward (V4); `nil` for untimed and older passes.
+    var durationMinutes: Int?
 
     init(
         id: UUID = UUID(),
@@ -339,7 +453,8 @@ final class RewardRedemption {
         iconName: String,
         pointsSpent: Int,
         kind: RewardKind,
-        redeemedAt: Date = .now
+        redeemedAt: Date = .now,
+        durationMinutes: Int? = nil
     ) {
         self.id = id
         self.rewardID = rewardID
@@ -349,6 +464,7 @@ final class RewardRedemption {
         self.pointsSpent = pointsSpent
         self.kind = kind
         self.redeemedAt = redeemedAt
+        self.durationMinutes = BreakPolicy.clamped(durationMinutes)
     }
 
     convenience init(reward: RewardCheckpoint, pointsSpent: Int, redeemedAt: Date = .now) {
@@ -359,7 +475,8 @@ final class RewardRedemption {
             iconName: reward.iconName,
             pointsSpent: pointsSpent,
             kind: reward.kind,
-            redeemedAt: redeemedAt
+            redeemedAt: redeemedAt,
+            durationMinutes: reward.breakMinutes
         )
     }
 
@@ -367,6 +484,89 @@ final class RewardRedemption {
     var passCode: String {
         let raw = id.uuidString.replacingOccurrences(of: "-", with: "")
         return "GF-\(raw.prefix(4))-\(raw.dropFirst(4).prefix(4))"
+    }
+}
+
+/// A claimed Guilt-Free Pass in the Saved Passes wallet. Timed passes wait here until the
+/// user starts the break timer (a Live Activity on iPhone); untimed ones until marked used.
+@Model
+final class ActivePass {
+    var id: UUID = UUID()
+    /// The `RewardRedemption` (voucher) this pass belongs to.
+    var redemptionID: UUID?
+    var title: String = ""
+    var details: String = ""
+    var iconName: String = "ticket.fill"
+    /// Break length (at least 30); `nil` for untimed passes.
+    var durationMinutes: Int?
+    var source: PassSource = PassSource.shop
+    var rarity: PassRarity = PassRarity.common
+    var createdAt: Date = Date.now
+    /// When the break timer started.
+    var startedAt: Date?
+    /// When the break timer ends.
+    var endsAt: Date?
+    /// Ended early, marked used, or seen expired.
+    var finishedAt: Date?
+
+    init(
+        id: UUID = UUID(),
+        redemptionID: UUID?,
+        title: String,
+        details: String,
+        iconName: String,
+        durationMinutes: Int?,
+        source: PassSource,
+        rarity: PassRarity = .common,
+        createdAt: Date = .now
+    ) {
+        self.id = id
+        self.redemptionID = redemptionID
+        self.title = title
+        self.details = details
+        self.iconName = iconName
+        self.durationMinutes = BreakPolicy.clamped(durationMinutes)
+        self.source = source
+        self.rarity = rarity
+        self.createdAt = createdAt
+    }
+
+    enum Status: Equatable {
+        /// In the wallet, timer not started (or an unused untimed pass).
+        case saved
+        /// Break timer running until `endsAt`.
+        case running(endsAt: Date)
+        case used
+    }
+
+    func status(at now: Date = .now) -> Status {
+        if finishedAt != nil { return .used }
+        if let endsAt {
+            return endsAt > now ? .running(endsAt: endsAt) : .used
+        }
+        return .saved
+    }
+
+    var isTimed: Bool { durationMinutes != nil }
+    var breakMinutes: Int? { BreakPolicy.clamped(durationMinutes) }
+}
+
+/// Non-task XP and markers: ritual completions (+25 XP) and the Early Finisher bonus.
+@Model
+final class MomentumEvent {
+    var id: UUID = UUID()
+    var kind: MomentumEventKind = MomentumEventKind.sundayReset
+    var xp: Int = 0
+    var occurredAt: Date = Date.now
+    /// Cards reviewed in a ritual.
+    var itemCount: Int = 0
+
+    init(id: UUID = UUID(), kind: MomentumEventKind, xp: Int, occurredAt: Date = .now, itemCount: Int = 0) {
+        self.id = id
+        self.kind = kind
+        self.xp = xp
+        self.occurredAt = occurredAt
+        self.itemCount = itemCount
     }
 }
 
@@ -436,18 +636,22 @@ extension Calendar {
 }
 
 enum PlannerStats {
-    /// Lifetime XP from all completed tasks.
-    static func totalXP(_ tasks: [TaskItem]) -> Int {
-        tasks.reduce(0) { $0 + ($1.isCompleted ? $1.effort.points : 0) }
+    /// Lifetime XP: completed tasks (with their combo multipliers) plus ritual bonuses.
+    static func totalXP(_ tasks: [TaskItem], events: [MomentumEvent] = []) -> Int {
+        tasks.reduce(0) { $0 + $1.earnedXP } + events.reduce(0) { $0 + $1.xp }
     }
 
-    /// XP from tasks completed on the calendar day containing `day`.
-    static func xpEarned(on day: Date, tasks: [TaskItem], calendar: Calendar = .current) -> Int {
-        tasks.reduce(0) { sum, task in
+    /// XP earned on the calendar day containing `day`.
+    static func xpEarned(on day: Date, tasks: [TaskItem], events: [MomentumEvent] = [], calendar: Calendar = .current) -> Int {
+        let taskXP = tasks.reduce(0) { sum, task in
             guard task.isCompleted, let completedAt = task.completedAt,
                   calendar.isDate(completedAt, inSameDayAs: day) else { return sum }
-            return sum + task.effort.points
+            return sum + task.earnedXP
         }
+        let bonusXP = events.reduce(0) { sum, event in
+            calendar.isDate(event.occurredAt, inSameDayAs: day) ? sum + event.xp : sum
+        }
+        return taskXP + bonusXP
     }
 
     static func completedCount(_ tasks: [TaskItem]) -> Int {
@@ -519,6 +723,7 @@ enum PlannerStats {
 enum PreviewSampleData {
     static let modelTypes: [any PersistentModel.Type] = [
         TaskItem.self, Award.self, RewardCheckpoint.self, RewardRedemption.self,
+        ActivePass.self, MomentumEvent.self,
     ]
 
     /// In-memory container pre-filled with sample tasks, rewards, passes and evaluated awards.
@@ -540,6 +745,8 @@ enum PreviewSampleData {
 
     static let awardEngine = AwardEngine()
 
+    static let comboEngine = ComboEngine()
+
     static let notificationManager = NotificationManager(
         defaults: UserDefaults(suiteName: "momentum.preview") ?? .standard
     )
@@ -547,7 +754,8 @@ enum PreviewSampleData {
     static let store = TaskStore(
         context: container.mainContext,
         awardEngine: awardEngine,
-        notificationManager: notificationManager
+        notificationManager: notificationManager,
+        comboEngine: comboEngine
     )
 
     static var sampleTask: TaskItem {
@@ -566,11 +774,12 @@ enum PreviewSampleData {
     static var sampleRedemption: RewardRedemption {
         RewardRedemption(
             rewardID: nil,
-            title: "1 Hour Gaming / Hobby Session",
-            details: "Uninterrupted personal hobby time earned through deep focus.",
+            title: "1-Hour Gaming / Movie Session",
+            details: "A full hour of games or a movie, earned through deep focus.",
             iconName: "gamecontroller.fill",
-            pointsSpent: 150,
-            kind: .shopReward
+            pointsSpent: 120,
+            kind: .shopReward,
+            durationMinutes: 60
         )
     }
 
@@ -683,6 +892,7 @@ extension View {
             .environment(PreviewSampleData.store)
             .environment(PreviewSampleData.awardEngine)
             .environment(PreviewSampleData.notificationManager)
+            .environment(PreviewSampleData.comboEngine)
             .tint(Theme.indigo)
             .preferredColorScheme(.dark)
     }

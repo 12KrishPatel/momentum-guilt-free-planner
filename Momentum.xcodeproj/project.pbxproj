@@ -8,40 +8,123 @@
 
 /* Begin PBXBuildFile section */
 		06A8D311BB2FEC2D5BCA2DA0 /* RewardEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB0E6C2FAF857D2F53DAA256 /* RewardEngine.swift */; };
+		08EB0F2EA3B22639A2524831 /* SmallWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3610246BE2DA3E53BA37393C /* SmallWidgetView.swift */; };
+		0F7EF108A36E66247786F749 /* BreakPassAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61AF10341CBC61601C1857C7 /* BreakPassAttributes.swift */; };
 		139F3FB8C81677C1838A18C7 /* GuiltFreePassView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C79BC2F392043BB585D3A9F /* GuiltFreePassView.swift */; };
 		1615F4B710D09A59999E0DC0 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207479830B8F535CA2171628 /* NotificationManager.swift */; };
+		16BA06FA890A8B30126C51E8 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207479830B8F535CA2171628 /* NotificationManager.swift */; };
 		2332F064DDA44BB221A0220E /* TaskRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDBE78DDAB1681EF62FF617 /* TaskRowView.swift */; };
+		2764B7BF1C643BC7E3740568 /* PlatformHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88111A09B2900B8F7A10B73 /* PlatformHelpers.swift */; };
 		292F9A2B0FA4938B66EDCB75 /* AwardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E96EC4348C313B5BA4DA67 /* AwardsView.swift */; };
+		29F23CB95137199935ADAC5A /* ComboViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14DD7F8910672C832AFF1CCE /* ComboViews.swift */; };
+		2E82BAD90AEED006730F55A9 /* WidgetIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 210C072CF7C9E71B221DE61E /* WidgetIntents.swift */; };
+		2EF2711E5C06806D0D321437 /* RewardEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB0E6C2FAF857D2F53DAA256 /* RewardEngine.swift */; };
+		2FDA1A91EB1CFB96C5C0512F /* TaskStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20E56D072CD3B151DB0909E9 /* TaskStore.swift */; };
 		356E2688E029390A99DD151A /* AwardEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F10124820D5DA5E17D05DC7 /* AwardEngine.swift */; };
 		37D30727DFC95002A4BA03D5 /* RewardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD2BD0F9E4B3A226E762D445 /* RewardsView.swift */; };
+		38F7969AA0C490E633D11F21 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB30DA9F95410022F00C29EA /* LiveActivityManager.swift */; };
+		453269B0AD9FA7F2C1F48C4E /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3DC49A9BA96AB9B7B6B4223 /* Models.swift */; };
 		49B6B5CF1910A624BBBBA241 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A0D18B397F7B4F7EDE092F7 /* StatsView.swift */; };
+		5426B32848BFD1B827C5646B /* SharedModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CC6505E45EB3A6A3148DDE /* SharedModelContainer.swift */; };
+		61942043D14B105640661E00 /* ComboEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03428E2D98410A7DF5761671 /* ComboEngine.swift */; };
+		674DD0E51694946D8CC70197 /* TaskTimelineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC3C376D992AB7D57B8893D /* TaskTimelineProvider.swift */; };
+		691B6C2B81F2F07B619BF05A /* AwardEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F10124820D5DA5E17D05DC7 /* AwardEngine.swift */; };
+		6999821732190D068B323E46 /* SavedPassesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFE9EA9B4B2F2AA077B05652 /* SavedPassesView.swift */; };
+		6C272070400B290EB48ED7FB /* BreakPassAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61AF10341CBC61601C1857C7 /* BreakPassAttributes.swift */; };
+		6F8E11A4BA9CE1DF68F6C7C3 /* CrateOpeningModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C7F49701A75CF320F656726 /* CrateOpeningModal.swift */; };
+		71B5536D52A772F6567030B3 /* TaskPlannerWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = D14166B6BFBE4F4D43AB26FC /* TaskPlannerWidgets.swift */; };
+		772EE78F4B0E1A88E3EFCAC4 /* MacRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C8053FF34785F57AC5688CB /* MacRootView.swift */; };
+		7A11CFD3112C79638FF85DD7 /* LargeWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7FDCE42900E0F3E028D7326 /* LargeWidgetView.swift */; };
+		7BAB13F2E0A4BF09BA3B3877 /* MysteryVaultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C1226A53F31BC7A1ECDF81 /* MysteryVaultView.swift */; };
+		86511DC9811BB2D21E380C96 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 58AF5597BAEC7D40AE64B0B4 /* Assets.xcassets */; };
+		8EB0419614E50ACA79E4E1FE /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 19518660D6DA7299F7C3AEB3 /* PrivacyInfo.xcprivacy */; };
+		920FD1F35129A2C28E815F5F /* MediumWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D8924C544A1A055923623F /* MediumWidgetView.swift */; };
+		93C3D314A43FB200E8E78D39 /* WidgetIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 210C072CF7C9E71B221DE61E /* WidgetIntents.swift */; };
 		9472417F47071F7099C0C46E /* TaskStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20E56D072CD3B151DB0909E9 /* TaskStore.swift */; };
+		96E488951D5D4D05F8867A82 /* BreakPassLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 906314E4D5F37465DDCB135C /* BreakPassLiveActivity.swift */; };
+		9DF1F033E8035FBD421DDC0F /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111E64F5FBFA0C2E220C9908 /* Theme.swift */; };
 		A70B7A2D06A2186EA32641B4 /* PlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F521B6759618D80210828611 /* PlanView.swift */; };
 		AA5F5A11932BA39887AF7224 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3DC49A9BA96AB9B7B6B4223 /* Models.swift */; };
+		B18E6A1F0004BDAE76FB640A /* RitualFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA56B2DA95CD0F4089E3D2B0 /* RitualFlowView.swift */; };
+		BD1D8B9158F7BC96BEAC6FED /* ComboEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03428E2D98410A7DF5761671 /* ComboEngine.swift */; };
 		BD3E664301DD1B4B199C2523 /* AddTaskSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3043A8E5C88D81C36D4771A7 /* AddTaskSheet.swift */; };
 		C3AC2048812724BED0E8A6AD /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111E64F5FBFA0C2E220C9908 /* Theme.swift */; };
+		CA904D320804E2EB7E87FFBC /* PlatformHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88111A09B2900B8F7A10B73 /* PlatformHelpers.swift */; };
 		D186B1C740DC5E186E41227D /* AppMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DCED6372375F20AB1C5D39E /* AppMain.swift */; };
+		DE0EB8BD8BBF5A6ABB829FB5 /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EFE11018F0176D5A283B7C3 /* AppCommands.swift */; };
 		DFAFECA18FAF06B87127E5B5 /* BadgeMedallionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D859908A09287A6BA49C9C /* BadgeMedallionView.swift */; };
 		E0D1B0288277AD6638C00914 /* WeekStripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44A91EC762A32E980B2BA8A /* WeekStripView.swift */; };
+		E31BEB7A6393F305C4051DDD /* TaskPlannerWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5B5562F93AC967DAEF293FDE /* TaskPlannerWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		EDCF2F0024F2D9445166FDBC /* SharedModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CC6505E45EB3A6A3148DDE /* SharedModelContainer.swift */; };
+		EE19BE751CF4E16888CBBD49 /* WidgetComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FB9B39C1A19B12261DD552 /* WidgetComponents.swift */; };
+		FADF63F30C35C8568E6C9CBF /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 577FA6EC35792E59D4E124E3 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		ACD276AEF57CD4588452CAB7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4E5D8953E51CDD5146C17B3B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 64AF7A5BE474F98C0F35DC12;
+			remoteInfo = TaskPlannerWidgets;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		17E282649D5758DB9392537E /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				E31BEB7A6393F305C4051DDD /* TaskPlannerWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		03428E2D98410A7DF5761671 /* ComboEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComboEngine.swift; sourceTree = "<group>"; };
 		111E64F5FBFA0C2E220C9908 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		14DD7F8910672C832AFF1CCE /* ComboViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComboViews.swift; sourceTree = "<group>"; };
+		16FB9B39C1A19B12261DD552 /* WidgetComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetComponents.swift; sourceTree = "<group>"; };
+		19518660D6DA7299F7C3AEB3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		207479830B8F535CA2171628 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		20E56D072CD3B151DB0909E9 /* TaskStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskStore.swift; sourceTree = "<group>"; };
+		210C072CF7C9E71B221DE61E /* WidgetIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetIntents.swift; sourceTree = "<group>"; };
 		3043A8E5C88D81C36D4771A7 /* AddTaskSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskSheet.swift; sourceTree = "<group>"; };
 		30E96EC4348C313B5BA4DA67 /* AwardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AwardsView.swift; sourceTree = "<group>"; };
+		3610246BE2DA3E53BA37393C /* SmallWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallWidgetView.swift; sourceTree = "<group>"; };
 		3C79BC2F392043BB585D3A9F /* GuiltFreePassView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuiltFreePassView.swift; sourceTree = "<group>"; };
 		4A0D18B397F7B4F7EDE092F7 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
 		4F10124820D5DA5E17D05DC7 /* AwardEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AwardEngine.swift; sourceTree = "<group>"; };
+		577FA6EC35792E59D4E124E3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		58AF5597BAEC7D40AE64B0B4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5B5562F93AC967DAEF293FDE /* TaskPlannerWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = TaskPlannerWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		5EFE11018F0176D5A283B7C3 /* AppCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCommands.swift; sourceTree = "<group>"; };
+		61AF10341CBC61601C1857C7 /* BreakPassAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakPassAttributes.swift; sourceTree = "<group>"; };
 		6DCED6372375F20AB1C5D39E /* AppMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMain.swift; sourceTree = "<group>"; };
+		72C1226A53F31BC7A1ECDF81 /* MysteryVaultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MysteryVaultView.swift; sourceTree = "<group>"; };
 		85D859908A09287A6BA49C9C /* BadgeMedallionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeMedallionView.swift; sourceTree = "<group>"; };
+		8C7F49701A75CF320F656726 /* CrateOpeningModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrateOpeningModal.swift; sourceTree = "<group>"; };
+		906314E4D5F37465DDCB135C /* BreakPassLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakPassLiveActivity.swift; sourceTree = "<group>"; };
+		9C8053FF34785F57AC5688CB /* MacRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacRootView.swift; sourceTree = "<group>"; };
+		A9D8924C544A1A055923623F /* MediumWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediumWidgetView.swift; sourceTree = "<group>"; };
 		B69EEEA475A7AD0BF07A19EE /* Momentum.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Momentum.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B7FDCE42900E0F3E028D7326 /* LargeWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeWidgetView.swift; sourceTree = "<group>"; };
+		BA56B2DA95CD0F4089E3D2B0 /* RitualFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RitualFlowView.swift; sourceTree = "<group>"; };
 		BD2BD0F9E4B3A226E762D445 /* RewardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsView.swift; sourceTree = "<group>"; };
 		CB0E6C2FAF857D2F53DAA256 /* RewardEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardEngine.swift; sourceTree = "<group>"; };
+		CB30DA9F95410022F00C29EA /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
 		CBDBE78DDAB1681EF62FF617 /* TaskRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRowView.swift; sourceTree = "<group>"; };
+		CDC3C376D992AB7D57B8893D /* TaskTimelineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTimelineProvider.swift; sourceTree = "<group>"; };
+		D14166B6BFBE4F4D43AB26FC /* TaskPlannerWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPlannerWidgets.swift; sourceTree = "<group>"; };
+		D1CC6505E45EB3A6A3148DDE /* SharedModelContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedModelContainer.swift; sourceTree = "<group>"; };
 		D44A91EC762A32E980B2BA8A /* WeekStripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekStripView.swift; sourceTree = "<group>"; };
+		D88111A09B2900B8F7A10B73 /* PlatformHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformHelpers.swift; sourceTree = "<group>"; };
 		E3DC49A9BA96AB9B7B6B4223 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		EFE9EA9B4B2F2AA077B05652 /* SavedPassesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedPassesView.swift; sourceTree = "<group>"; };
 		F521B6759618D80210828611 /* PlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -50,6 +133,7 @@
 			isa = PBXGroup;
 			children = (
 				B69EEEA475A7AD0BF07A19EE /* Momentum.app */,
+				5B5562F93AC967DAEF293FDE /* TaskPlannerWidgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -58,21 +142,36 @@
 			isa = PBXGroup;
 			children = (
 				3043A8E5C88D81C36D4771A7 /* AddTaskSheet.swift */,
+				5EFE11018F0176D5A283B7C3 /* AppCommands.swift */,
 				6DCED6372375F20AB1C5D39E /* AppMain.swift */,
+				58AF5597BAEC7D40AE64B0B4 /* Assets.xcassets */,
 				4F10124820D5DA5E17D05DC7 /* AwardEngine.swift */,
 				30E96EC4348C313B5BA4DA67 /* AwardsView.swift */,
 				85D859908A09287A6BA49C9C /* BadgeMedallionView.swift */,
+				61AF10341CBC61601C1857C7 /* BreakPassAttributes.swift */,
+				03428E2D98410A7DF5761671 /* ComboEngine.swift */,
+				14DD7F8910672C832AFF1CCE /* ComboViews.swift */,
+				8C7F49701A75CF320F656726 /* CrateOpeningModal.swift */,
 				3C79BC2F392043BB585D3A9F /* GuiltFreePassView.swift */,
+				CB30DA9F95410022F00C29EA /* LiveActivityManager.swift */,
+				9C8053FF34785F57AC5688CB /* MacRootView.swift */,
 				E3DC49A9BA96AB9B7B6B4223 /* Models.swift */,
+				72C1226A53F31BC7A1ECDF81 /* MysteryVaultView.swift */,
 				207479830B8F535CA2171628 /* NotificationManager.swift */,
 				F521B6759618D80210828611 /* PlanView.swift */,
+				D88111A09B2900B8F7A10B73 /* PlatformHelpers.swift */,
+				577FA6EC35792E59D4E124E3 /* PrivacyInfo.xcprivacy */,
 				CB0E6C2FAF857D2F53DAA256 /* RewardEngine.swift */,
 				BD2BD0F9E4B3A226E762D445 /* RewardsView.swift */,
+				BA56B2DA95CD0F4089E3D2B0 /* RitualFlowView.swift */,
+				EFE9EA9B4B2F2AA077B05652 /* SavedPassesView.swift */,
+				D1CC6505E45EB3A6A3148DDE /* SharedModelContainer.swift */,
 				4A0D18B397F7B4F7EDE092F7 /* StatsView.swift */,
 				CBDBE78DDAB1681EF62FF617 /* TaskRowView.swift */,
 				20E56D072CD3B151DB0909E9 /* TaskStore.swift */,
 				111E64F5FBFA0C2E220C9908 /* Theme.swift */,
 				D44A91EC762A32E980B2BA8A /* WeekStripView.swift */,
+				210C072CF7C9E71B221DE61E /* WidgetIntents.swift */,
 			);
 			path = Momentum;
 			sourceTree = "<group>";
@@ -81,22 +180,59 @@
 			isa = PBXGroup;
 			children = (
 				0E5C42B8022156CAFEE9CF72 /* Momentum */,
+				DA75BAED1460E4F725793271 /* TaskPlannerWidgets */,
 				0306DA9880E9CA4982DEF226 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		DA75BAED1460E4F725793271 /* TaskPlannerWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				906314E4D5F37465DDCB135C /* BreakPassLiveActivity.swift */,
+				B7FDCE42900E0F3E028D7326 /* LargeWidgetView.swift */,
+				A9D8924C544A1A055923623F /* MediumWidgetView.swift */,
+				19518660D6DA7299F7C3AEB3 /* PrivacyInfo.xcprivacy */,
+				3610246BE2DA3E53BA37393C /* SmallWidgetView.swift */,
+				D14166B6BFBE4F4D43AB26FC /* TaskPlannerWidgets.swift */,
+				CDC3C376D992AB7D57B8893D /* TaskTimelineProvider.swift */,
+				16FB9B39C1A19B12261DD552 /* WidgetComponents.swift */,
+			);
+			path = TaskPlannerWidgets;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		64AF7A5BE474F98C0F35DC12 /* TaskPlannerWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0F6D8B66A34AD067BDA8197F /* Build configuration list for PBXNativeTarget "TaskPlannerWidgets" */;
+			buildPhases = (
+				8A2D8F4B16170286A9B148E0 /* Sources */,
+				DA853D24CA359C85407EE8C6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TaskPlannerWidgets;
+			packageProductDependencies = (
+			);
+			productName = TaskPlannerWidgets;
+			productReference = 5B5562F93AC967DAEF293FDE /* TaskPlannerWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		AC46F839FC04585A879AE9F5 /* Momentum */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0C9B509C4C7EEB799542B220 /* Build configuration list for PBXNativeTarget "Momentum" */;
 			buildPhases = (
 				856EAE00C142B111439F9AF9 /* Sources */,
+				DFFFB808399221B909903E6C /* Resources */,
+				17E282649D5758DB9392537E /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A06FD8BB09A137656D47F264 /* PBXTargetDependency */,
 			);
 			name = Momentum;
 			packageProductDependencies = (
@@ -114,6 +250,14 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					64AF7A5BE474F98C0F35DC12 = {
+						DevelopmentTeam = C66WHXJG96;
+						ProvisioningStyle = Automatic;
+					};
+					AC46F839FC04585A879AE9F5 = {
+						DevelopmentTeam = C66WHXJG96;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = FAA9351CE675123C61FF2222 /* Build configuration list for PBXProject "Momentum" */;
@@ -131,9 +275,30 @@
 			projectRoot = "";
 			targets = (
 				AC46F839FC04585A879AE9F5 /* Momentum */,
+				64AF7A5BE474F98C0F35DC12 /* TaskPlannerWidgets */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DA853D24CA359C85407EE8C6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8EB0419614E50ACA79E4E1FE /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DFFFB808399221B909903E6C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				86511DC9811BB2D21E380C96 /* Assets.xcassets in Resources */,
+				FADF63F30C35C8568E6C9CBF /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		856EAE00C142B111439F9AF9 /* Sources */ = {
@@ -141,45 +306,134 @@
 			buildActionMask = 2147483647;
 			files = (
 				BD3E664301DD1B4B199C2523 /* AddTaskSheet.swift in Sources */,
+				DE0EB8BD8BBF5A6ABB829FB5 /* AppCommands.swift in Sources */,
 				D186B1C740DC5E186E41227D /* AppMain.swift in Sources */,
 				356E2688E029390A99DD151A /* AwardEngine.swift in Sources */,
 				292F9A2B0FA4938B66EDCB75 /* AwardsView.swift in Sources */,
 				DFAFECA18FAF06B87127E5B5 /* BadgeMedallionView.swift in Sources */,
+				6C272070400B290EB48ED7FB /* BreakPassAttributes.swift in Sources */,
+				61942043D14B105640661E00 /* ComboEngine.swift in Sources */,
+				29F23CB95137199935ADAC5A /* ComboViews.swift in Sources */,
+				6F8E11A4BA9CE1DF68F6C7C3 /* CrateOpeningModal.swift in Sources */,
 				139F3FB8C81677C1838A18C7 /* GuiltFreePassView.swift in Sources */,
+				38F7969AA0C490E633D11F21 /* LiveActivityManager.swift in Sources */,
+				772EE78F4B0E1A88E3EFCAC4 /* MacRootView.swift in Sources */,
 				AA5F5A11932BA39887AF7224 /* Models.swift in Sources */,
+				7BAB13F2E0A4BF09BA3B3877 /* MysteryVaultView.swift in Sources */,
 				1615F4B710D09A59999E0DC0 /* NotificationManager.swift in Sources */,
 				A70B7A2D06A2186EA32641B4 /* PlanView.swift in Sources */,
+				CA904D320804E2EB7E87FFBC /* PlatformHelpers.swift in Sources */,
 				06A8D311BB2FEC2D5BCA2DA0 /* RewardEngine.swift in Sources */,
 				37D30727DFC95002A4BA03D5 /* RewardsView.swift in Sources */,
+				B18E6A1F0004BDAE76FB640A /* RitualFlowView.swift in Sources */,
+				6999821732190D068B323E46 /* SavedPassesView.swift in Sources */,
+				EDCF2F0024F2D9445166FDBC /* SharedModelContainer.swift in Sources */,
 				49B6B5CF1910A624BBBBA241 /* StatsView.swift in Sources */,
 				2332F064DDA44BB221A0220E /* TaskRowView.swift in Sources */,
 				9472417F47071F7099C0C46E /* TaskStore.swift in Sources */,
 				C3AC2048812724BED0E8A6AD /* Theme.swift in Sources */,
 				E0D1B0288277AD6638C00914 /* WeekStripView.swift in Sources */,
+				2E82BAD90AEED006730F55A9 /* WidgetIntents.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8A2D8F4B16170286A9B148E0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				691B6C2B81F2F07B619BF05A /* AwardEngine.swift in Sources */,
+				0F7EF108A36E66247786F749 /* BreakPassAttributes.swift in Sources */,
+				96E488951D5D4D05F8867A82 /* BreakPassLiveActivity.swift in Sources */,
+				BD1D8B9158F7BC96BEAC6FED /* ComboEngine.swift in Sources */,
+				7A11CFD3112C79638FF85DD7 /* LargeWidgetView.swift in Sources */,
+				920FD1F35129A2C28E815F5F /* MediumWidgetView.swift in Sources */,
+				453269B0AD9FA7F2C1F48C4E /* Models.swift in Sources */,
+				16BA06FA890A8B30126C51E8 /* NotificationManager.swift in Sources */,
+				2764B7BF1C643BC7E3740568 /* PlatformHelpers.swift in Sources */,
+				2EF2711E5C06806D0D321437 /* RewardEngine.swift in Sources */,
+				5426B32848BFD1B827C5646B /* SharedModelContainer.swift in Sources */,
+				08EB0F2EA3B22639A2524831 /* SmallWidgetView.swift in Sources */,
+				71B5536D52A772F6567030B3 /* TaskPlannerWidgets.swift in Sources */,
+				2FDA1A91EB1CFB96C5C0512F /* TaskStore.swift in Sources */,
+				674DD0E51694946D8CC70197 /* TaskTimelineProvider.swift in Sources */,
+				9DF1F033E8035FBD421DDC0F /* Theme.swift in Sources */,
+				EE19BE751CF4E16888CBBD49 /* WidgetComponents.swift in Sources */,
+				93C3D314A43FB200E8E78D39 /* WidgetIntents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		A06FD8BB09A137656D47F264 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 64AF7A5BE474F98C0F35DC12 /* TaskPlannerWidgets */;
+			targetProxy = ACD276AEF57CD4588452CAB7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		21B7E6D25E73FB272242B796 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_ENTITLEMENTS[sdk=iphone*]" = "TaskPlannerWidgets/TaskPlannerWidgets-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "TaskPlannerWidgets/TaskPlannerWidgets-macOS.entitlements";
+				CURRENT_PROJECT_VERSION = 4;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/TaskPlannerWidgets-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Momentum Widgets";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 3.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.krishpatel.momentum.widgets;
+				PRODUCT_NAME = TaskPlannerWidgets;
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) WIDGET_EXTENSION";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
 		3429B9D867D1504D10F752C2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_ENTITLEMENTS[sdk=iphone*]" = "Momentum/Momentum-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Momentum/Momentum-macOS.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/Momentum-Info.plist";
+				"INFOPLIST_FILE[sdk=iphone*]" = "Config/Momentum-iOS-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Momentum;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphone*]" = YES;
+				"INFOPLIST_KEY_UISupportedInterfaceOrientations[sdk=iphone*]" = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.momentum;
-				SDKROOT = iphoneos;
+				MARKETING_VERSION = 3.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.krishpatel.momentum;
+				PRODUCT_NAME = Momentum;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -219,8 +473,10 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = C66WHXJG96;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -232,10 +488,11 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
+				SDKROOT = auto;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
@@ -275,8 +532,10 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = C66WHXJG96;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -294,11 +553,12 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
+				SDKROOT = auto;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -309,25 +569,68 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_ENTITLEMENTS[sdk=iphone*]" = "Momentum/Momentum-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Momentum/Momentum-macOS.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/Momentum-Info.plist";
+				"INFOPLIST_FILE[sdk=iphone*]" = "Config/Momentum-iOS-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Momentum;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphone*]" = YES;
+				"INFOPLIST_KEY_UISupportedInterfaceOrientations[sdk=iphone*]" = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.momentum;
-				SDKROOT = iphoneos;
+				MARKETING_VERSION = 3.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.krishpatel.momentum;
+				PRODUCT_NAME = Momentum;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
+		};
+		FE29885D3B34E8A56E11D225 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_ENTITLEMENTS[sdk=iphone*]" = "TaskPlannerWidgets/TaskPlannerWidgets-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "TaskPlannerWidgets/TaskPlannerWidgets-macOS.entitlements";
+				CURRENT_PROJECT_VERSION = 4;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/TaskPlannerWidgets-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Momentum Widgets";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 3.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.krishpatel.momentum.widgets;
+				PRODUCT_NAME = TaskPlannerWidgets;
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) WIDGET_EXTENSION";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -337,6 +640,15 @@
 			buildConfigurations = (
 				B2177D8D3C55ABF1FEA3C42A /* Debug */,
 				3429B9D867D1504D10F752C2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		0F6D8B66A34AD067BDA8197F /* Build configuration list for PBXNativeTarget "TaskPlannerWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				21B7E6D25E73FB272242B796 /* Debug */,
+				FE29885D3B34E8A56E11D225 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

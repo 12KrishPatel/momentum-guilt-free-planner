@@ -32,6 +32,9 @@ final class NotificationManager {
         static let enabled = "reminders.enabled"
     }
 
+    /// Settings keys, so they can be moved into the App Group defaults the widget reads.
+    nonisolated static let persistedKeys = ["reminders.slots", "reminders.enabled"]
+
     /// User-configurable schedule, persisted as JSON in `UserDefaults`.
     var slots: [ReminderSlot] {
         didSet { persistSlots() }
@@ -50,7 +53,9 @@ final class NotificationManager {
     @ObservationIgnored private let presenter = ForegroundNotificationPresenter()
     @ObservationIgnored private var syncTask: Task<Void, Never>?
 
-    init(defaults: UserDefaults = .standard) {
+    /// Defaults to the App Group suite so the widget extension resyncs reminders with the
+    /// user's schedule rather than the built-in one.
+    init(defaults: UserDefaults = SharedModelContainer.sharedDefaults) {
         self.defaults = defaults
         if let data = defaults.data(forKey: Keys.slots),
            let stored = try? JSONDecoder().decode([ReminderSlot].self, from: data) {
@@ -63,10 +68,24 @@ final class NotificationManager {
     }
 
     var isAuthorized: Bool {
-        switch authorizationStatus {
-        case .authorized, .provisional, .ephemeral: true
-        default: false
+        Self.allowsDelivery(authorizationStatus)
+    }
+
+    /// `.ephemeral` (App Clips) only exists on iOS.
+    nonisolated static func allowsDelivery(_ status: UNAuthorizationStatus) -> Bool {
+        switch status {
+        case .authorized, .provisional: return true
+        #if os(iOS)
+        case .ephemeral: return true
+        #endif
+        default: return false
         }
+    }
+
+    /// Sends the user to iOS Settings or macOS System Settings → Notifications
+    /// (used when permission was denied).
+    func openSystemNotificationSettings() {
+        Platform.openNotificationSettings()
     }
 
     // MARK: Slot editing
@@ -102,6 +121,12 @@ final class NotificationManager {
     }
 
     // MARK: Synchronization
+
+    /// Waits for the most recent resync to reach the system (used by widget intents, whose
+    /// process may be suspended as soon as `perform()` returns).
+    func waitForPendingSync() async {
+        await syncTask?.value
+    }
 
     /// Clears every app-managed pending reminder and reschedules the enabled slots
     /// for today and the next 7 days, with content generated from `tasks`.
@@ -222,10 +247,7 @@ final class NotificationManager {
         center.removePendingNotificationRequests(withIdentifiers: stale)
 
         guard !plan.isEmpty, !Task.isCancelled else { return 0 }
-        switch await center.notificationSettings().authorizationStatus {
-        case .authorized, .provisional, .ephemeral: break
-        default: return 0
-        }
+        guard allowsDelivery(await center.notificationSettings().authorizationStatus) else { return 0 }
 
         var scheduled = 0
         for item in plan {

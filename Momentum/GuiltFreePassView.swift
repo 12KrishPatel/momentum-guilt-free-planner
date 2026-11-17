@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 /// Ticket outline with semicircular notches cut into both sides at `notchY`.
@@ -41,18 +42,33 @@ struct TicketShape: Shape {
 struct GuiltFreePassView: View {
     @Environment(\.dismiss) private var dismiss
     let redemption: RewardRedemption
+    /// The wallet entry for this voucher (V4 passes); drives the break timer.
+    @Query private var passes: [ActivePass]
 
     @State private var hasAppeared = false
     @State private var shine = false
     /// Height of the ticket's top section, so the notches line up with the perforation.
     @State private var topHeight: CGFloat = 0
 
+    init(redemption: RewardRedemption) {
+        self.redemption = redemption
+        let id = redemption.id
+        _passes = Query(filter: #Predicate<ActivePass> { $0.redemptionID == id })
+    }
+
+    private var pass: ActivePass? { passes.first }
+
     private var isActive: Bool {
-        Calendar.current.isDateInToday(redemption.redeemedAt)
+        if let pass { return pass.status() != .used }
+        return Calendar.current.isDateInToday(redemption.redeemedAt)
     }
 
     private var colors: [Color] {
-        redemption.kind == .dailyCheckpoint ? Theme.successColors : Theme.primaryColors
+        switch redemption.kind {
+        case .dailyCheckpoint: Theme.successColors
+        case .mysteryCrate: pass?.rarity.colors ?? Theme.legendaryColors
+        case .shopReward: Theme.primaryColors
+        }
     }
 
     var body: some View {
@@ -63,6 +79,11 @@ struct GuiltFreePassView: View {
                         .scaleEffect(hasAppeared ? 1 : 0.6)
                         .rotation3DEffect(.degrees(hasAppeared ? 0 : 25), axis: (x: 1, y: 0, z: 0))
                         .opacity(hasAppeared ? 1 : 0)
+
+                    if let pass {
+                        BreakTimerControls(pass: pass)
+                            .padding(.horizontal, 8)
+                    }
 
                     Text("Enjoy it—no guilt. You earned this.")
                         .font(.subheadline.weight(.medium))
@@ -94,6 +115,7 @@ struct GuiltFreePassView: View {
         }
         .presentationDetents([.large])
         .presentationBackground(Theme.obsidianTop)
+        .macSheetFrame(width: 440, height: 700)
         .sensoryFeedback(.success, trigger: hasAppeared) { _, appeared in appeared }
         .onAppear {
             withAnimation(.spring(response: 0.6, dampingFraction: 0.65)) {
@@ -158,10 +180,10 @@ struct GuiltFreePassView: View {
             // Stub: the details
             VStack(spacing: 12) {
                 stubRow(label: "Issued", value: redemption.redeemedAt.formatted(date: .abbreviated, time: .shortened))
-                stubRow(
-                    label: "Paid",
-                    value: redemption.pointsSpent > 0 ? "\(redemption.pointsSpent) Leisure Points" : "Daily checkpoint · Free"
-                )
+                if let minutes = redemption.durationMinutes {
+                    stubRow(label: "Length", value: BreakPolicy.label(for: minutes))
+                }
+                stubRow(label: "Paid", value: paidText)
                 stubRow(label: "Pass No.", value: redemption.passCode, monospaced: true)
             }
             .padding(22)
@@ -187,8 +209,25 @@ struct GuiltFreePassView: View {
         .accessibilityElement(children: .combine)
     }
 
+    private var paidText: String {
+        switch redemption.kind {
+        case .dailyCheckpoint: "Daily checkpoint · Free"
+        case .mysteryCrate: "\(redemption.pointsSpent) pts · Mystery Crate"
+        case .shopReward: "\(redemption.pointsSpent) Leisure Points"
+        }
+    }
+
+    private var statusText: String {
+        guard let pass else { return isActive ? "ACTIVE" : "REDEEMED" }
+        switch pass.status() {
+        case .saved: return pass.source == .mysteryCrate ? pass.rarity.title.uppercased() : "SAVED"
+        case .running: return "ON BREAK"
+        case .used: return "REDEEMED"
+        }
+    }
+
     private var statusPill: some View {
-        Text(isActive ? "ACTIVE" : "REDEEMED")
+        Text(statusText)
             .font(.system(size: 10, weight: .heavy, design: .rounded))
             .tracking(1.2)
             .foregroundStyle(isActive ? Color.white : .white.opacity(0.75))
