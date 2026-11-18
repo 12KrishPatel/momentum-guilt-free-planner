@@ -25,6 +25,7 @@
 		38F7969AA0C490E633D11F21 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB30DA9F95410022F00C29EA /* LiveActivityManager.swift */; };
 		453269B0AD9FA7F2C1F48C4E /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3DC49A9BA96AB9B7B6B4223 /* Models.swift */; };
 		49B6B5CF1910A624BBBBA241 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A0D18B397F7B4F7EDE092F7 /* StatsView.swift */; };
+		50AE1BD4CA6221400DAFF55D /* LegalViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA378EE345BEAE0C8E092D4D /* LegalViews.swift */; };
 		5426B32848BFD1B827C5646B /* SharedModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CC6505E45EB3A6A3148DDE /* SharedModelContainer.swift */; };
 		61942043D14B105640661E00 /* ComboEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03428E2D98410A7DF5761671 /* ComboEngine.swift */; };
 		674DD0E51694946D8CC70197 /* TaskTimelineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC3C376D992AB7D57B8893D /* TaskTimelineProvider.swift */; };
@@ -113,6 +114,7 @@
 		A9D8924C544A1A055923623F /* MediumWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediumWidgetView.swift; sourceTree = "<group>"; };
 		B69EEEA475A7AD0BF07A19EE /* Momentum.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Momentum.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7FDCE42900E0F3E028D7326 /* LargeWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeWidgetView.swift; sourceTree = "<group>"; };
+		BA378EE345BEAE0C8E092D4D /* LegalViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegalViews.swift; sourceTree = "<group>"; };
 		BA56B2DA95CD0F4089E3D2B0 /* RitualFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RitualFlowView.swift; sourceTree = "<group>"; };
 		BD2BD0F9E4B3A226E762D445 /* RewardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsView.swift; sourceTree = "<group>"; };
 		CB0E6C2FAF857D2F53DAA256 /* RewardEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardEngine.swift; sourceTree = "<group>"; };
@@ -153,6 +155,7 @@
 				14DD7F8910672C832AFF1CCE /* ComboViews.swift */,
 				8C7F49701A75CF320F656726 /* CrateOpeningModal.swift */,
 				3C79BC2F392043BB585D3A9F /* GuiltFreePassView.swift */,
+				BA378EE345BEAE0C8E092D4D /* LegalViews.swift */,
 				CB30DA9F95410022F00C29EA /* LiveActivityManager.swift */,
 				9C8053FF34785F57AC5688CB /* MacRootView.swift */,
 				E3DC49A9BA96AB9B7B6B4223 /* Models.swift */,
@@ -316,6 +319,7 @@
 				29F23CB95137199935ADAC5A /* ComboViews.swift in Sources */,
 				6F8E11A4BA9CE1DF68F6C7C3 /* CrateOpeningModal.swift in Sources */,
 				139F3FB8C81677C1838A18C7 /* GuiltFreePassView.swift in Sources */,
+				50AE1BD4CA6221400DAFF55D /* LegalViews.swift in Sources */,
 				38F7969AA0C490E633D11F21 /* LiveActivityManager.swift in Sources */,
 				772EE78F4B0E1A88E3EFCAC4 /* MacRootView.swift in Sources */,
 				AA5F5A11932BA39887AF7224 /* Models.swift in Sources */,

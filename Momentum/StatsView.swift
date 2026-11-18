@@ -13,6 +13,7 @@ struct StatsView: View {
 
     @State private var isConfirmingReset = false
     @State private var eraseCount = 0
+    @State private var aboutPage: AboutPage?
 
     private let cardColumns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
 
@@ -99,6 +100,28 @@ struct StatsView: View {
                 }
 
                 Section {
+                    Button {
+                        aboutPage = .privacy
+                    } label: {
+                        aboutRow("Privacy Policy", icon: "hand.raised.fill")
+                    }
+                    Button {
+                        aboutPage = .support
+                    } label: {
+                        aboutRow("Help & Support", icon: "questionmark.bubble.fill")
+                    }
+                    LabeledContent {
+                        Text(AppInfo.versionString)
+                            .foregroundStyle(Theme.textSecondary)
+                    } label: {
+                        Label("Version", systemImage: "info.circle.fill")
+                    }
+                } header: {
+                    Text("About")
+                }
+                .glassRow()
+
+                Section {
                     Button(role: .destructive) {
                         isConfirmingReset = true
                     } label: {
@@ -127,6 +150,9 @@ struct StatsView: View {
                 Text("Every task, badge, point, pass and custom reward will be deleted on all your devices. This can’t be undone.")
             }
             .sensoryFeedback(.success, trigger: eraseCount)
+            .sheet(item: $aboutPage) { page in
+                DocumentSheet.page(page)
+            }
             .onChange(of: manager.slots) {
                 store.syncNotifications()
             }
@@ -177,6 +203,20 @@ struct StatsView: View {
 }
 
 // MARK: - Permission badge
+
+extension StatsView {
+    fileprivate func aboutRow(_ title: String, icon: String) -> some View {
+        HStack {
+            Label(title, systemImage: icon)
+                .foregroundStyle(Theme.textPrimary)
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Theme.textTertiary)
+        }
+        .contentShape(Rectangle())
+    }
+}
 
 struct PermissionBadge: View {
     let status: UNAuthorizationStatus
