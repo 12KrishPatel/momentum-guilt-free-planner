@@ -12,7 +12,7 @@ struct StatsView: View {
     @Query private var events: [MomentumEvent]
 
     @State private var isConfirmingReset = false
-    @State private var resetCount = 0
+    @State private var eraseCount = 0
 
     private let cardColumns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
 
@@ -102,12 +102,12 @@ struct StatsView: View {
                     Button(role: .destructive) {
                         isConfirmingReset = true
                     } label: {
-                        Label("Reset & Re-Seed Demo Data", systemImage: "arrow.triangle.2.circlepath")
+                        Label("Erase All Data", systemImage: "trash")
                     }
                 } header: {
-                    Text("Testing")
+                    Text("Data")
                 } footer: {
-                    Text("Replaces all tasks, badges and passes with a sample data set. Custom rewards are kept.")
+                    Text("Deletes all tasks, badges, points, passes and custom rewards, including on your other devices signed in to the same iCloud account. Reminder settings are kept.")
                 }
                 .glassRow()
             }
@@ -115,18 +115,18 @@ struct StatsView: View {
             .themedScreen()
             .navigationTitle(Platform.isMac ? "Stats & Settings" : "Profile")
             .confirmationDialog(
-                "Replace all tasks, badges and passes with demo data?",
+                "Erase all Momentum data?",
                 isPresented: $isConfirmingReset,
                 titleVisibility: .visible
             ) {
-                Button("Reset & Re-Seed", role: .destructive) {
-                    withAnimation { store.resetDemoData() }
-                    resetCount += 1
+                Button("Erase All Data", role: .destructive) {
+                    withAnimation { store.eraseAllData() }
+                    eraseCount += 1
                 }
             } message: {
-                Text("Your current tasks, badge progress and pass history will be deleted. This can’t be undone.")
+                Text("Every task, badge, point, pass and custom reward will be deleted on all your devices. This can’t be undone.")
             }
-            .sensoryFeedback(.success, trigger: resetCount)
+            .sensoryFeedback(.success, trigger: eraseCount)
             .onChange(of: manager.slots) {
                 store.syncNotifications()
             }

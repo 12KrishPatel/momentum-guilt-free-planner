@@ -361,32 +361,25 @@ final class TaskStore {
         notificationManager.syncNotifications(tasks: allTasks())
     }
 
-    /// Wipes tasks, awards and passes, then re-seeds the demo data set. Custom rewards are kept.
-    func resetDemoData() {
+    /// Erase All Data: deletes every task, badge, pass, ritual record and custom reward, then
+    /// restores the built-in rewards and a fresh (all-locked) badge catalog. With iCloud sync
+    /// on, the deletions reach the user's other devices too. Reminder settings are kept.
+    func eraseAllData() {
         awardEngine.clearPendingUnlocks()
-        for task in allTasks() {
-            context.delete(task)
-        }
-        for award in fetch(FetchDescriptor<Award>()) {
-            context.delete(award)
-        }
-        for redemption in allRedemptions() {
-            context.delete(redemption)
-        }
-        for pass in allPasses() {
-            context.delete(pass)
-        }
-        for event in allEvents() {
-            context.delete(event)
-        }
         #if !WIDGET_EXTENSION
         LiveActivityManager.shared.endBreakActivity()
         #endif
+        for task in allTasks() { context.delete(task) }
+        for award in fetch(FetchDescriptor<Award>()) { context.delete(award) }
+        for redemption in allRedemptions() { context.delete(redemption) }
+        for pass in allPasses() { context.delete(pass) }
+        for event in allEvents() { context.delete(event) }
+        for reward in fetch(FetchDescriptor<RewardCheckpoint>()) where reward.isCustom {
+            context.delete(reward)
+        }
         save()
 
-        PreviewSampleData.insertSampleTasks(into: context)
         RewardCatalog.seedIfNeeded(in: context)
-        PreviewSampleData.insertSampleRedemptions(into: context)
         awardEngine.seedAwardsIfNeeded(in: context)
         commit(announceAwards: false)
     }
